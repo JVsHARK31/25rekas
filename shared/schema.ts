@@ -2,29 +2,40 @@ import { pgTable, text, varchar, integer, decimal, timestamp, boolean, serial, u
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users table
+// Users table - matching existing database structure
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
-  role: varchar("role", { length: 50 }).notNull().default("viewer"),
-  name: varchar("name", { length: 255 }),
+  id: varchar("id").primaryKey(),
+  username: text("username"),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  fullName: text("full_name"),
+  role: varchar("role").notNull().default("viewer"),
+  schoolName: text("school_name"),
+  isActive: boolean("is_active").default(true),
+  lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// RKAS Activities table
+// RKAS Activities table - matching existing database structure
 export const rkasActivities = pgTable("rkas_activities", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: varchar("name", { length: 500 }).notNull(),
-  description: text("description"),
-  bidang: varchar("bidang", { length: 255 }).notNull(),
-  standard: varchar("standard", { length: 500 }).notNull(),
-  budget: decimal("budget", { precision: 15, scale: 2 }).notNull(),
-  status: varchar("status", { length: 50 }).notNull().default("draft"),
-  quarter: varchar("quarter", { length: 10 }),
-  month: integer("month"),
-  year: integer("year").notNull(),
-  responsible: varchar("responsible", { length: 255 }).notNull(),
+  id: varchar("id").primaryKey(),
+  standardId: varchar("standard_id"),
+  kodeGiat: text("kode_giat"),
+  namaGiat: text("nama_giat"),
+  subtitle: text("subtitle"),
+  kodeDana: text("kode_dana"),
+  namaDana: text("nama_dana"),
+  tw1: decimal("tw1"),
+  tw2: decimal("tw2"),  
+  tw3: decimal("tw3"),
+  tw4: decimal("tw4"),
+  total: decimal("total"),
+  realisasi: decimal("realisasi"),
+  tanggal: timestamp("tanggal"),
+  noPesanan: text("no_pesanan"),
+  status: varchar("status").notNull().default("draft"),
+  createdBy: varchar("created_by"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
