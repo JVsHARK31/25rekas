@@ -1,0 +1,90 @@
+You are tasked with developing a comprehensive RKAS (Rencana Kegiatan dan Anggaran Sekolah) Management Web Application called "eRKAS Pro" for Indonesian schools. This system must handle school budget planning, revision, and management from 2022-2030.
+
+## Core Requirements
+
+### Data Structure (Based on Provided Excel Format)
+The application must support the following hierarchical data structure:
+- **KODE_BIDANG** & **NAMA_BIDANG** (e.g., "01" - "Kurikulum")
+- **KODE_STANDAR** & **NAMA_STANDAR** (e.g., "2" - "Pengembangan Standar Isi")
+- **KODE_GIAT** & **NAMA_GIAT** (e.g., "01.3.02.01.2.001" - "02.02. Pengembangan Perpustakaan")
+- **SUBTITLE** (Activity descriptions)
+- **KODE_DANA** & **NAMA_DANA** (e.g., "3.02.01" - "BOP Alokasi Dasar")
+- **TW 1-4** (Quarterly budget allocations)
+- Additional fields: REALISASI, TANGGAL, NO_PESANAN
+
+### Technical Architecture
+- **Frontend**: React.js with TailwindCSS and TanStack Table
+- **Backend**: Node.js/Express or Supabase Edge Functions
+- **Database**: Supabase Postgres or Firebase Firestore
+- **Authentication**: Supabase Auth or Firebase Auth
+- **File Storage**: Supabase Storage or Firebase Storage
+- **Hosting**: Vercel, Netlify, or Firebase Hosting
+
+### Authentication & User Management
+Implement role-based access control with:
+- **Super Admin**: Full system access, user management, data approval
+- **Operator**: Data management for assigned units/schools
+- **Viewer**: Read-only access
+
+Default admin credentials:
+- Email: admin@rkas.com
+- Password: 123456
+
+### Core Functionalities
+
+1. **Dynamic RKAS Table Management**
+   - Inline editing with real-time calculations
+   - Add/remove/reorder columns via drag-and-drop
+   - Grouping and filtering by any field
+   - Auto-calculation of quarterly totals (TW1-TW4)
+
+2. **Budget Validation Engine**
+   - Prevent negative values and budget overruns
+   - Real-time total calculations
+   - Breakdown analysis by funding source (BOP, BOS, DAK)
+
+3. **File Management System**
+   - Upload supporting documents (JPG, PNG, PDF, DOCX)
+   - Attach files to specific activities
+   - Secure file storage and retrieval
+
+4. **Workflow Management**
+   - Draft → Submit → Review → Approve workflow
+   - Data locking after approval
+   - Revision request capability
+
+5. **Export & Reporting**
+   - Export to Excel (.xlsx), PDF, and JSON formats
+   - Printable reports with school headers
+   - Year-wise data export
+
+6. **Audit & Version Control**
+   - Complete edit history tracking
+   - Version rollback functionality
+   - User activity logs
+
+### Advanced Features
+- Smart auto-fill based on previous years' data
+- Email/WhatsApp notification system
+- Offline PWA capabilities
+- QR codes for document verification
+- AI-powered budget anomaly detection
+
+### Deliverables Required
+1. Production-ready, modular codebase
+2. Responsive dashboard interface
+3. Pre-loaded 2024 data converted from Excel to JSON
+4. Database schema for chosen platform
+5. Complete deployment documentation with CI/CD setup
+6. Entity Relationship Diagram (ERD)
+7. User manual and administrator guide
+
+### Quality Standards
+The final application must be:
+- Enterprise-grade and audit-compliant
+- Fully responsive across all devices
+- Accessible (WCAG 2.1 compliant)
+- Optimized for educational and governmental use
+- Scalable to handle multiple schools simultaneously
+
+Ensure all features work seamlessly together and provide a professional user experience suitable for Indonesian educational institutions.
