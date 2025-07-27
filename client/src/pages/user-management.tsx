@@ -99,13 +99,13 @@ export default function UserManagement() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-erkas-secondary mb-1">Total Users</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <div className="text-2xl font-bold text-slate-900">
                       {isLoading ? (
                         <div className="erkas-loading h-6 w-12" />
                       ) : (
                         users?.length || 0
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center">
                     <UserPlus className="text-erkas-primary" size={24} />
@@ -119,13 +119,13 @@ export default function UserManagement() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-erkas-secondary mb-1">Active Users</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <div className="text-2xl font-bold text-slate-900">
                       {isLoading ? (
                         <div className="erkas-loading h-6 w-12" />
                       ) : (
                         activeUsers.length
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center">
                     <UserPlus className="text-erkas-success" size={24} />
@@ -139,13 +139,13 @@ export default function UserManagement() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-erkas-secondary mb-1">Pending Approval</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <div className="text-2xl font-bold text-slate-900">
                       {isLoading ? (
                         <div className="erkas-loading h-6 w-8" />
                       ) : (
                         pendingUsers.length
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="h-12 w-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                     <UserPlus className="text-yellow-600" size={24} />
