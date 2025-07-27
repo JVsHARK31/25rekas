@@ -15,8 +15,19 @@ import Workflow from "@/pages/workflow";
 import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
+
+// RKAS Pages
 import KegiatanRKAS from "@/pages/rkas/kegiatan";
+import RincianAnggaran from "@/pages/rkas/rincian";
+import AnggaranKas from "@/pages/rkas/kas";
+import RealisasiRKAS from "@/pages/rkas/realisasi";
+
+// Master Data Pages
 import BidangKegiatan from "@/pages/master/bidang";
+import StandarNasional from "@/pages/master/standar";
+import SumberDana from "@/pages/master/sumber-dana";
+import Rekening from "@/pages/master/rekening";
+import Komponen from "@/pages/master/komponen";
 
 function Router() {
   return (
@@ -24,9 +35,22 @@ function Router() {
       <Route path="/" component={LoginPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/dashboard" component={Dashboard} />
+      
+      {/* RKAS Routes */}
       <Route path="/rkas" component={RkasManagement} />
       <Route path="/rkas/kegiatan" component={KegiatanRKAS} />
+      <Route path="/rkas/rincian" component={RincianAnggaran} />
+      <Route path="/rkas/kas" component={AnggaranKas} />
+      <Route path="/rkas/realisasi" component={RealisasiRKAS} />
+      
+      {/* Master Data Routes */}
       <Route path="/master/bidang" component={BidangKegiatan} />
+      <Route path="/master/standar" component={StandarNasional} />
+      <Route path="/master/sumber-dana" component={SumberDana} />
+      <Route path="/master/rekening" component={Rekening} />
+      <Route path="/master/komponen" component={Komponen} />
+      
+      {/* Other Routes */}
       <Route path="/files" component={FileManagement} />
       <Route path="/users" component={UserManagement} />
       <Route path="/budget-analysis" component={BudgetAnalysis} />

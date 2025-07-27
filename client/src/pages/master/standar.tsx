@@ -7,24 +7,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Globe } from "lucide-react";
 
-export default function BidangKegiatan() {
+export default function StandarNasional() {
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    kodeBidang: "",
-    namaBidang: ""
+    bidangId: "",
+    kodeStandar: "",
+    namaStandar: "",
+    deskripsi: ""
   });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    setIsDialogOpen(false);
-    setFormData({ kodeBidang: "", namaBidang: "" });
-  };
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -40,12 +36,18 @@ export default function BidangKegiatan() {
     );
   }
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+    setIsDialogOpen(false);
+    setFormData({ bidangId: "", kodeStandar: "", namaStandar: "", deskripsi: "" });
+  };
+
   const sampleData = [
-    { id: 1, kode: "01", nama: "KURIKULUM", jumlahStandar: 8, status: "Aktif" },
-    { id: 2, kode: "02", nama: "KESISWAAN", jumlahStandar: 5, status: "Aktif" },
-    { id: 3, kode: "03", nama: "SARANA & PRASARANA", jumlahStandar: 12, status: "Aktif" },
-    { id: 4, kode: "04", nama: "HUMAS & KEHUMASAN", jumlahStandar: 3, status: "Aktif" },
-    { id: 5, kode: "05", nama: "TATA USAHA", jumlahStandar: 7, status: "Aktif" },
+    { id: 1, bidang: "KURIKULUM", kode: "1.1", nama: "Standar Kompetensi Lulusan", deskripsi: "Kriteria mengenai kualifikasi kemampuan lulusan" },
+    { id: 2, bidang: "KURIKULUM", kode: "1.2", nama: "Standar Isi", deskripsi: "Ruang lingkup materi dan tingkat kompetensi" },
+    { id: 3, bidang: "KESISWAAN", kode: "2.1", nama: "Standar Proses", deskripsi: "Standar nasional pendidikan yang berkaitan dengan pelaksanaan pembelajaran" },
+    { id: 4, bidang: "SARANA & PRASARANA", kode: "3.1", nama: "Standar Sarana dan Prasarana", deskripsi: "Standar nasional pendidikan yang berkaitan dengan kriteria minimal sarana dan prasarana" }
   ];
 
   return (
@@ -58,39 +60,63 @@ export default function BidangKegiatan() {
         <main className="flex-1 overflow-auto p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Bidang Kegiatan</h2>
-              <p className="text-slate-600">Kelola bidang kegiatan RKAS</p>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Standar Nasional</h2>
+              <p className="text-slate-600">Kelola standar nasional pendidikan</p>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-green-600 hover:bg-green-700">
                   <Plus className="mr-2" size={18} />
-                  Tambah Bidang
+                  Tambah Standar
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle>Tambah Bidang Kegiatan</DialogTitle>
+                  <DialogTitle>Tambah Standar Nasional</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <Label htmlFor="kodeBidang">Kode Bidang</Label>
+                    <Label htmlFor="bidangId">Bidang Kegiatan</Label>
+                    <Select value={formData.bidangId} onValueChange={(value) => setFormData({...formData, bidangId: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih bidang kegiatan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="01">01 - KURIKULUM</SelectItem>
+                        <SelectItem value="02">02 - KESISWAAN</SelectItem>
+                        <SelectItem value="03">03 - SARANA & PRASARANA</SelectItem>
+                        <SelectItem value="04">04 - HUMAS & KEHUMASAN</SelectItem>
+                        <SelectItem value="05">05 - TATA USAHA</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="kodeStandar">Kode Standar</Label>
                     <Input
-                      id="kodeBidang"
-                      value={formData.kodeBidang}
-                      onChange={(e) => setFormData({...formData, kodeBidang: e.target.value})}
-                      placeholder="Contoh: 06"
+                      id="kodeStandar"
+                      value={formData.kodeStandar}
+                      onChange={(e) => setFormData({...formData, kodeStandar: e.target.value})}
+                      placeholder="Contoh: 1.1"
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="namaBidang">Nama Bidang</Label>
+                    <Label htmlFor="namaStandar">Nama Standar</Label>
                     <Input
-                      id="namaBidang"
-                      value={formData.namaBidang}
-                      onChange={(e) => setFormData({...formData, namaBidang: e.target.value})}
-                      placeholder="Masukkan nama bidang"
+                      id="namaStandar"
+                      value={formData.namaStandar}
+                      onChange={(e) => setFormData({...formData, namaStandar: e.target.value})}
+                      placeholder="Masukkan nama standar"
                       required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="deskripsi">Deskripsi</Label>
+                    <Input
+                      id="deskripsi"
+                      value={formData.deskripsi}
+                      onChange={(e) => setFormData({...formData, deskripsi: e.target.value})}
+                      placeholder="Masukkan deskripsi standar"
                     />
                   </div>
                   <div className="flex justify-end space-x-2 pt-4">
@@ -106,46 +132,44 @@ export default function BidangKegiatan() {
             </Dialog>
           </div>
 
-          {/* Search */}
           <div className="flex items-center space-x-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 text-slate-400" size={20} />
               <Input
                 type="text"
-                placeholder="Cari bidang kegiatan..."
+                placeholder="Cari standar nasional..."
                 className="pl-10"
               />
             </div>
           </div>
 
-          {/* Data Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Daftar Bidang Kegiatan</CardTitle>
+              <CardTitle>Daftar Standar Nasional</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-4 font-medium text-slate-600">Bidang</th>
                       <th className="text-left py-3 px-4 font-medium text-slate-600">Kode</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-600">Nama Bidang</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-600">Jumlah Standar</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-600">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-slate-600">Nama Standar</th>
+                      <th className="text-left py-3 px-4 font-medium text-slate-600">Deskripsi</th>
                       <th className="text-left py-3 px-4 font-medium text-slate-600">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {sampleData.map((item) => (
                       <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                        <td className="py-3 px-4 font-mono font-medium text-slate-900">{item.kode}</td>
-                        <td className="py-3 px-4 text-slate-900">{item.nama}</td>
-                        <td className="py-3 px-4 text-slate-600">{item.jumlahStandar}</td>
                         <td className="py-3 px-4">
-                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                            {item.status}
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                            {item.bidang}
                           </span>
                         </td>
+                        <td className="py-3 px-4 font-mono font-medium text-slate-900">{item.kode}</td>
+                        <td className="py-3 px-4 text-slate-900">{item.nama}</td>
+                        <td className="py-3 px-4 text-slate-600 max-w-xs truncate">{item.deskripsi}</td>
                         <td className="py-3 px-4">
                           <div className="flex space-x-2">
                             <Button variant="outline" size="sm">
