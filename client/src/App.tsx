@@ -21,6 +21,8 @@ import KegiatanRKAS from "@/pages/rkas/kegiatan";
 import RincianAnggaran from "@/pages/rkas/rincian";
 import AnggaranKas from "@/pages/rkas/kas";
 import RealisasiRKAS from "@/pages/rkas/realisasi";
+import RKASKegiatan from "@/pages/rkas-kegiatan";
+import RKASAnggaran from "@/pages/rkas-anggaran";
 
 // Master Data Pages
 import BidangKegiatan from "@/pages/master/bidang";
@@ -42,6 +44,8 @@ function Router() {
       <Route path="/rkas/rincian" component={RincianAnggaran} />
       <Route path="/rkas/kas" component={AnggaranKas} />
       <Route path="/rkas/realisasi" component={RealisasiRKAS} />
+      <Route path="/rkas-kegiatan" component={RKASKegiatan} />
+      <Route path="/rkas-anggaran" component={RKASAnggaran} />
       
       {/* Master Data Routes */}
       <Route path="/master/bidang" component={BidangKegiatan} />

@@ -38,8 +38,8 @@ const navigationItems = [
     icon: Table, 
     roles: ["super_admin", "operator", "viewer"],
     submenu: [
-      { name: "Kegiatan RKAS", href: "/rkas/kegiatan", icon: CheckSquare },
-      { name: "Rincian Anggaran", href: "/rkas/rincian", icon: DollarSign },
+      { name: "Kegiatan RKAS", href: "/rkas-kegiatan", icon: CheckSquare },
+      { name: "Rincian Anggaran", href: "/rkas-anggaran", icon: DollarSign },
       { name: "Anggaran Kas", href: "/rkas/kas", icon: CreditCard },
       { name: "Realisasi", href: "/rkas/realisasi", icon: Target }
     ]
