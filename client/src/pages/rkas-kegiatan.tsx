@@ -18,11 +18,13 @@ import {
   Trash2,
   Eye,
   Download,
-  AlertTriangle
+  AlertTriangle,
+  Save
 } from "lucide-react";
 import PeriodSelector, { PeriodType, Quarter, Month } from "@/components/dashboard/period-selector";
 import KegiatanForm from "@/components/forms/kegiatan-form";
 import { useKegiatanDB } from "@/hooks/use-kegiatan-db";
+import { usePreferences } from "@/hooks/use-preferences";
 import { toast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -94,20 +96,27 @@ export default function RKASKegiatan() {
 
   // Use database CRUD operations
   const { activities, loading, createKegiatan, updateKegiatan, deleteKegiatan } = useKegiatanDB();
+  
+  // Use preferences hook for saving filter settings
+  const { savePreferences } = usePreferences();
 
   // Filter activities based on selected period
   const filteredActivities = activities.filter(activity => {
-    const matchesSearch = activity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         activity.bidang.toLowerCase().includes(searchTerm.toLowerCase());
+    const activityName = activity.namaGiat || activity.name || '';
+    const activityBidang = activity.bidang || '';
+    const matchesSearch = activityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         activityBidang.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || activity.status === statusFilter;
-    const matchesBidang = bidangFilter === 'all' || activity.bidang === bidangFilter;
-    const matchesYear = activity.year === selectedYear;
+    const matchesBidang = bidangFilter === 'all' || activityBidang === bidangFilter;
+    const matchesYear = true; // Temporarily disable year filter until we have proper year data
     
     let matchesPeriod = true;
     if (selectedPeriodType === 'quarterly') {
-      matchesPeriod = activity.quarter === selectedQuarter;
+      // For now, show all activities regardless of quarter
+      matchesPeriod = true;
     } else if (selectedPeriodType === 'monthly') {
-      matchesPeriod = activity.month === selectedMonth;
+      // For now, show all activities regardless of month
+      matchesPeriod = true;
     }
 
     return matchesSearch && matchesStatus && matchesBidang && matchesYear && matchesPeriod;
@@ -176,17 +185,44 @@ export default function RKASKegiatan() {
             </div>
           </div>
 
-          {/* Advanced Period Selector */}
-          <PeriodSelector
-            selectedPeriodType={selectedPeriodType}
-            selectedQuarter={selectedQuarter}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onPeriodTypeChange={setSelectedPeriodType}
-            onQuarterChange={setSelectedQuarter}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-          />
+          {/* Advanced Period Selector with Save Button */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-5 w-5" />
+                  <span>Filter Periode</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => savePreferences({
+                    periodType: selectedPeriodType,
+                    selectedQuarter,
+                    selectedMonth,
+                    selectedYear,
+                    lastUsedPage: 'rkas-kegiatan'
+                  })}
+                  className="flex items-center space-x-2"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Simpan Filter</span>
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PeriodSelector
+                selectedPeriodType={selectedPeriodType}
+                selectedQuarter={selectedQuarter}
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                onPeriodTypeChange={setSelectedPeriodType}
+                onQuarterChange={setSelectedQuarter}
+                onMonthChange={setSelectedMonth}
+                onYearChange={setSelectedYear}
+              />
+            </CardContent>
+          </Card>
 
           {/* Search and Filters */}
           <Card className="mb-6">
@@ -308,28 +344,32 @@ export default function RKASKegiatan() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredActivities.map((activity) => {
-                        const activityPeriod = selectedPeriodType === 'quarterly' 
-                          ? `${activity.quarter} ${activity.year}`
-                          : `${['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][activity.month - 1]} ${activity.year}`;
+                      {filteredActivities.map((activity: any) => {
+                        const activityPeriod = activity.tanggal 
+                          ? new Date(activity.tanggal).toLocaleDateString('id-ID', { 
+                              year: 'numeric', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })
+                          : 'Tanggal tidak tersedia';
 
                         return (
                           <tr key={activity.id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div>
                                 <div className="text-sm font-medium text-gray-900">
-                                  {activity.name}
+                                  {activity.namaGiat || activity.name || 'Nama kegiatan tidak tersedia'}
                                 </div>
                                 <div className="text-sm text-gray-500">
-                                  {activity.description}
+                                  {activity.subtitle || activity.description || 'Kode: ' + (activity.kodeGiat || '-')}
                                 </div>
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge variant="secondary">{activity.bidang}</Badge>
+                              <Badge variant="secondary">{activity.namaDana || activity.bidang || 'Tidak tersedia'}</Badge>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {formatCurrency(activity.budget)}
+                              {formatCurrency(Number(activity.total) || Number(activity.budget) || 0)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <Badge className={getStatusColor(activity.status)}>
