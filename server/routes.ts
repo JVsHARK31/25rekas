@@ -2,8 +2,60 @@ import { Request, Response, Router } from 'express';
 import { storage } from './storage';
 import { insertRKASActivitySchema, insertRKASBudgetItemSchema, insertUserPreferenceSchema } from '@shared/schema';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const router = Router();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Authentication routes
+router.post('/api/auth/login', async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Find user by email
+    const user = await storage.getUserByUsername(email);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.full_name || user.username,
+        role: user.role,
+        fullName: user.full_name || user.username
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/api/auth/logout', (req: Request, res: Response) => {
+  res.json({ message: 'Logged out successfully' });
+});
 
 // RKAS Activities routes
 router.get('/api/activities', async (req: Request, res: Response) => {
