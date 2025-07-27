@@ -74,13 +74,13 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-erkas-secondary mb-1">Total Anggaran</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <div className="text-2xl font-bold text-slate-900">
                       {statsLoading ? (
                         <div className="erkas-loading h-6 w-24" />
                       ) : (
                         formatCurrency(stats?.budget.total || 0)
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center">
                     <TrendingUp className="text-erkas-primary" size={24} />
@@ -99,13 +99,13 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-erkas-secondary mb-1">Realisasi</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <div className="text-2xl font-bold text-slate-900">
                       {statsLoading ? (
                         <div className="erkas-loading h-6 w-24" />
                       ) : (
                         formatCurrency(stats?.budget.realized || 0)
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center">
                     <CheckCircle className="text-erkas-success" size={24} />
@@ -125,13 +125,13 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-erkas-secondary mb-1">Kegiatan Aktif</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <div className="text-2xl font-bold text-slate-900">
                       {statsLoading ? (
                         <div className="erkas-loading h-6 w-12" />
                       ) : (
                         stats?.activities.active || 0
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
                     <ClipboardList className="text-purple-600" size={24} />
@@ -149,13 +149,13 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-erkas-secondary mb-1">Revisi Pending</p>
-                    <p className="text-2xl font-bold text-slate-900">
+                    <div className="text-2xl font-bold text-slate-900">
                       {statsLoading ? (
                         <div className="erkas-loading h-6 w-8" />
                       ) : (
                         stats?.revisions.pending || 0
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="h-12 w-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                     <AlertTriangle className="text-yellow-600" size={24} />
