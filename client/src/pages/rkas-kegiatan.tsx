@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import PeriodSelector, { PeriodType, Quarter, Month } from "@/components/dashboard/period-selector";
 import KegiatanForm from "@/components/forms/kegiatan-form";
-import { useKegiatan } from "@/hooks/use-kegiatan";
+import { useKegiatanDB } from "@/hooks/use-kegiatan-db";
 import { toast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -92,8 +92,8 @@ export default function RKASKegiatan() {
     }
   };
 
-  // Use real CRUD operations
-  const { activities, loading, createActivity, updateActivity, deleteActivity } = useKegiatan();
+  // Use database CRUD operations
+  const { activities, loading, createKegiatan, updateKegiatan, deleteKegiatan } = useKegiatanDB();
 
   // Filter activities based on selected period
   const filteredActivities = activities.filter(activity => {
@@ -115,15 +115,15 @@ export default function RKASKegiatan() {
 
   // Handle CRUD operations
   const handleCreateActivity = async (data: any) => {
-    await createActivity(data);
+    await createKegiatan(data);
   };
 
   const handleUpdateActivity = async (id: string, data: any) => {
-    await updateActivity(id, data);
+    await updateKegiatan(id, data);
   };
 
   const handleDeleteActivity = async (id: string) => {
-    await deleteActivity(id);
+    await deleteKegiatan(id);
   };
 
   const getPeriodLabel = () => {

@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import PeriodSelector, { PeriodType, Quarter, Month } from "@/components/dashboard/period-selector";
 import AnggaranForm from "@/components/forms/anggaran-form";
-import { useAnggaran } from "@/hooks/use-anggaran";
+import { useAnggaranDB } from "@/hooks/use-anggaran-db";
 import { toast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -95,8 +95,8 @@ export default function RKASAnggaran() {
     }
   };
 
-  // Use real CRUD operations
-  const { budgetItems, loading, createBudgetItem, updateBudgetItem, deleteBudgetItem } = useAnggaran();
+  // Use database CRUD operations
+  const { budgetItems, loading, createBudgetItem, updateBudgetItem, deleteBudgetItem } = useAnggaranDB();
 
   // Filter budget items based on selected period
   const filteredBudgetItems = budgetItems.filter(item => {
@@ -148,9 +148,9 @@ export default function RKASAnggaran() {
   };
 
   // Calculate summary statistics
-  const totalAllocated = filteredBudgetItems.reduce((sum, item) => sum + item.allocatedBudget, 0);
-  const totalUsed = filteredBudgetItems.reduce((sum, item) => sum + item.usedBudget, 0);
-  const totalRemaining = filteredBudgetItems.reduce((sum, item) => sum + item.remainingBudget, 0);
+  const totalAllocated = filteredBudgetItems.reduce((sum: number, item: any) => sum + Number(item.allocatedBudget), 0);
+  const totalUsed = filteredBudgetItems.reduce((sum: number, item: any) => sum + Number(item.usedBudget), 0);
+  const totalRemaining = filteredBudgetItems.reduce((sum: number, item: any) => sum + Number(item.remainingBudget), 0);
   const utilizationPercentage = totalAllocated > 0 ? (totalUsed / totalAllocated) * 100 : 0;
 
   return (
