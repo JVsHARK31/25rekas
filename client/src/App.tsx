@@ -15,6 +15,8 @@ import Workflow from "@/pages/workflow";
 import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
+import KegiatanRKAS from "@/pages/rkas/kegiatan";
+import BidangKegiatan from "@/pages/master/bidang";
 
 function Router() {
   return (
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/login" component={LoginPage} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/rkas" component={RkasManagement} />
+      <Route path="/rkas/kegiatan" component={KegiatanRKAS} />
+      <Route path="/master/bidang" component={BidangKegiatan} />
       <Route path="/files" component={FileManagement} />
       <Route path="/users" component={UserManagement} />
       <Route path="/budget-analysis" component={BudgetAnalysis} />

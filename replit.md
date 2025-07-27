@@ -56,6 +56,13 @@ The system implements a hierarchical structure:
 - **Multi-currency Support**: Indonesian Rupiah formatting
 - **Multi-year Planning**: Budget years 2022-2030 with dynamic year selection
 
+### User Interface Features
+- **Hierarchical Navigation**: Expandable sidebar with RKAS and Master Data submenus
+- **Dashboard Cards**: 8-card layout (4x2 grid) matching reference design
+- **System Demo Notice**: Blue info banner for demo system indication
+- **Year Badge**: Green badge showing current budget year (2025)
+- **School Branding**: SMPN 25 Jakarta header with school number logo
+
 ### File Management System
 - **Supported Formats**: PDF, DOCX, JPG, PNG with 10MB size limit
 - **Category Organization**: Files organized by categories and activities

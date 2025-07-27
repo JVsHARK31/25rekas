@@ -8,7 +8,12 @@ import {
   AlertTriangle,
   Edit,
   Check,
-  Upload
+  Upload,
+  Clock,
+  FileText,
+  DollarSign,
+  Target,
+  Zap
 } from "lucide-react";
 
 import Header from "@/components/layout/header";
@@ -63,108 +68,208 @@ export default function Dashboard() {
         <Sidebar />
 
         <main className="flex-1 overflow-auto p-6">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Dashboard Overview</h2>
-            <p className="text-erkas-secondary">SMPN 25 Jakarta - Periode Anggaran {formatBudgetPeriod()}</p>
+          {/* Header with Year Badge */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Dashboard RKAS</h2>
+              <p className="text-slate-600">Selamat datang di Sistem RKAS SMPN 25 Jakarta</p>
+            </div>
+            <div className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium">
+              Tahun Anggaran 2025
+              <div className="text-xs opacity-90">Status: Aktif</div>
+            </div>
           </div>
 
-          {/* Stats Cards */}
+          {/* System Demo Notice */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start">
+            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+              <span className="text-white text-xs font-bold">i</span>
+            </div>
+            <div>
+              <p className="text-blue-800 text-sm">
+                <strong>Sistem Demo:</strong> Anda sedang menggunakan sistem demo RKAS dengan data simulasi SMPN 25 Jakarta. 
+                Semua fitur dapat digunakan untuk keperluan evaluasi dan pelatihan.
+              </p>
+            </div>
+          </div>
+
+          {/* Stats Cards - First Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {/* Total Kegiatan */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-500 mb-1">Total Kegiatan</p>
+                    <div className="text-3xl font-bold text-blue-600">
+                      {statsLoading ? (
+                        <div className="erkas-loading h-8 w-12" />
+                      ) : (
+                        "0"
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Kegiatan RKAS terdaftar</p>
+                  </div>
+                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <FileText className="text-blue-600" size={24} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Total Anggaran */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-500 mb-1">Total Anggaran</p>
+                    <div className="text-3xl font-bold text-green-600">
+                      {statsLoading ? (
+                        <div className="erkas-loading h-8 w-24" />
+                      ) : (
+                        "Rp 0"
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Anggaran keseluruhan</p>
+                  </div>
+                  <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <DollarSign className="text-green-600" size={24} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Kegiatan Disetujui */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-500 mb-1">Kegiatan Disetujui</p>
+                    <div className="text-3xl font-bold text-green-600">
+                      {statsLoading ? (
+                        <div className="erkas-loading h-8 w-12" />
+                      ) : (
+                        "0"
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Sudah mendapat persetujuan</p>
+                  </div>
+                  <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="text-green-600" size={24} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Menunggu Persetujuan */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-500 mb-1">Menunggu Persetujuan</p>
+                    <div className="text-3xl font-bold text-orange-600">
+                      {statsLoading ? (
+                        <div className="erkas-loading h-8 w-12" />
+                      ) : (
+                        "0"
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Dalam proses review</p>
+                  </div>
+                  <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Clock className="text-orange-600" size={24} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Stats Cards - Second Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Realisasi Anggaran */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-erkas-secondary mb-1">Total Anggaran</p>
-                    <div className="text-2xl font-bold text-slate-900">
+                    <p className="text-sm text-slate-500 mb-1">Realisasi Anggaran</p>
+                    <div className="text-3xl font-bold text-purple-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-6 w-24" />
+                        <div className="erkas-loading h-8 w-24" />
                       ) : (
-                        formatCurrency(stats?.budget.total || 0)
+                        "Rp 0"
                       )}
                     </div>
+                    <p className="text-xs text-slate-500 mt-1">0.0% dari total</p>
                   </div>
-                  <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <TrendingUp className="text-erkas-primary" size={24} />
+                  <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <TrendingUp className="text-purple-600" size={24} />
                   </div>
-                </div>
-                <div className="mt-4 flex items-center text-sm">
-                  <TrendingUp className="text-erkas-success mr-1" size={16} />
-                  <span className="text-erkas-success font-medium">12.5%</span>
-                  <span className="text-erkas-secondary ml-1">dari tahun lalu</span>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Kegiatan Terlambat */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-erkas-secondary mb-1">Realisasi</p>
-                    <div className="text-2xl font-bold text-slate-900">
+                    <p className="text-sm text-slate-500 mb-1">Kegiatan Terlambat</p>
+                    <div className="text-3xl font-bold text-red-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-6 w-24" />
+                        <div className="erkas-loading h-8 w-12" />
                       ) : (
-                        formatCurrency(stats?.budget.realized || 0)
+                        "0"
                       )}
                     </div>
+                    <p className="text-xs text-slate-500 mt-1">Perlu perhatian khusus</p>
                   </div>
-                  <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center">
-                    <CheckCircle className="text-erkas-success" size={24} />
+                  <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="text-red-600" size={24} />
                   </div>
-                </div>
-                <div className="mt-4 flex items-center text-sm">
-                  <span className="text-erkas-secondary">Persentase:</span>
-                  <span className="text-slate-900 font-medium ml-1">
-                    {stats && formatPercentage(stats.budget.realized, stats.budget.total)}
-                  </span>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Target Capaian */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-erkas-secondary mb-1">Kegiatan Aktif</p>
-                    <div className="text-2xl font-bold text-slate-900">
+                    <p className="text-sm text-slate-500 mb-1">Target Capaian</p>
+                    <div className="text-3xl font-bold text-blue-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-6 w-12" />
+                        <div className="erkas-loading h-8 w-12" />
                       ) : (
-                        stats?.activities.active || 0
+                        "0%"
                       )}
                     </div>
+                    <p className="text-xs text-slate-500 mt-1">Target semester ini</p>
                   </div>
-                  <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                    <ClipboardList className="text-purple-600" size={24} />
+                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Target className="text-blue-600" size={24} />
                   </div>
-                </div>
-                <div className="mt-4 flex items-center text-sm">
-                  <span className="text-erkas-secondary">Status:</span>
-                  <span className="text-slate-900 font-medium ml-1">Dalam Proses</span>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Aktivitas Hari Ini */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-erkas-secondary mb-1">Revisi Pending</p>
-                    <div className="text-2xl font-bold text-slate-900">
+                    <p className="text-sm text-slate-500 mb-1">Aktivitas Hari Ini</p>
+                    <div className="text-3xl font-bold text-teal-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-6 w-8" />
+                        <div className="erkas-loading h-8 w-12" />
                       ) : (
-                        stats?.revisions.pending || 0
+                        "12"
                       )}
                     </div>
+                    <p className="text-xs text-slate-500 mt-1">Update dan perubahan</p>
                   </div>
-                  <div className="h-12 w-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                    <AlertTriangle className="text-yellow-600" size={24} />
+                  <div className="h-12 w-12 bg-teal-100 rounded-full flex items-center justify-center">
+                    <Zap className="text-teal-600" size={24} />
                   </div>
-                </div>
-                <div className="mt-4 flex items-center text-sm">
-                  <span className="text-erkas-secondary">Memerlukan:</span>
-                  <span className="text-slate-900 font-medium ml-1">Persetujuan</span>
                 </div>
               </CardContent>
             </Card>
