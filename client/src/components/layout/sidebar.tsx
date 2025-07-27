@@ -17,7 +17,7 @@ import { AuthService } from "@/lib/auth";
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home, roles: ["super_admin", "operator", "viewer"] },
   { name: "RKAS Management", href: "/rkas", icon: Table, roles: ["super_admin", "operator", "viewer"] },
-  { name: "Budget Analysis", href: "/budget", icon: Calculator, roles: ["super_admin", "operator", "viewer"] },
+  { name: "Budget Analysis", href: "/budget-analysis", icon: Calculator, roles: ["super_admin", "operator", "viewer"] },
   { name: "File Management", href: "/files", icon: Folder, roles: ["super_admin", "operator", "viewer"] },
   { name: "Workflow", href: "/workflow", icon: CheckSquare, roles: ["super_admin", "operator"] },
   { name: "User Management", href: "/users", icon: Users, roles: ["super_admin"] },
