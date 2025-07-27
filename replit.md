@@ -54,6 +54,7 @@ The system implements a hierarchical structure:
 - **Budget Validation**: Prevents negative values and overruns
 - **Inline Editing**: Direct table cell editing with validation
 - **Multi-currency Support**: Indonesian Rupiah formatting
+- **Multi-year Planning**: Budget years 2022-2030 with dynamic year selection
 
 ### File Management System
 - **Supported Formats**: PDF, DOCX, JPG, PNG with 10MB size limit

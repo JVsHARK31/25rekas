@@ -16,6 +16,7 @@ import Sidebar from "@/components/layout/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { DashboardStats } from "@/types/rkas";
+import { getBudgetYearsDescending, formatBudgetPeriod } from "@/lib/budget-years";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -64,7 +65,7 @@ export default function Dashboard() {
         <main className="flex-1 overflow-auto p-6">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Dashboard Overview</h2>
-            <p className="text-erkas-secondary">SMPN 25 Jakarta - Periode Anggaran 2024-2030</p>
+            <p className="text-erkas-secondary">SMPN 25 Jakarta - Periode Anggaran {formatBudgetPeriod()}</p>
           </div>
 
           {/* Stats Cards */}
@@ -178,9 +179,9 @@ export default function Dashboard() {
                     Alokasi Anggaran per Bidang
                   </CardTitle>
                   <select className="text-sm border border-slate-300 rounded-lg px-3 py-2">
-                    <option>2024</option>
-                    <option>2023</option>
-                    <option>2022</option>
+                    {getBudgetYearsDescending().map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
                   </select>
                 </div>
               </CardHeader>
