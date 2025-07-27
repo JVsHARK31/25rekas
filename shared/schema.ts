@@ -143,7 +143,6 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  lastLogin: true,
 });
 
 export const insertRkasFieldSchema = createInsertSchema(rkasFields).omit({

@@ -125,8 +125,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createActivity(activity: InsertRkasActivity): Promise<RkasActivity> {
-    const total = parseFloat(activity.tw1) + parseFloat(activity.tw2) + 
-                  parseFloat(activity.tw3) + parseFloat(activity.tw4);
+    const total = parseFloat(activity.tw1 || "0") + parseFloat(activity.tw2 || "0") + 
+                  parseFloat(activity.tw3 || "0") + parseFloat(activity.tw4 || "0");
     
     const [newActivity] = await db
       .insert(rkasActivities)
@@ -136,7 +136,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateActivity(id: string, updates: Partial<InsertRkasActivity>): Promise<RkasActivity> {
-    let updateData = { ...updates, updatedAt: sql`now()` };
+    let updateData: any = { ...updates, updatedAt: sql`now()` };
     
     // Recalculate total if quarterly values are updated
     if (updates.tw1 || updates.tw2 || updates.tw3 || updates.tw4) {

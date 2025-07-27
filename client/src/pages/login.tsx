@@ -56,7 +56,8 @@ export default function LoginPage() {
             <School className="text-white text-2xl" size={32} />
           </div>
           <h2 className="text-3xl font-bold text-slate-900 mb-2">eRKAS Pro</h2>
-          <p className="text-erkas-secondary">Sistem Manajemen Anggaran Sekolah</p>
+          <p className="text-erkas-secondary">SMPN 25 Jakarta</p>
+          <p className="text-sm text-slate-500">Sistem Manajemen Anggaran Sekolah</p>
         </div>
 
         <Card className="mt-8">

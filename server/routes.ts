@@ -77,7 +77,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "24h" });
       
       // Update last login
-      await storage.updateUser(user.id, { lastLogin: new Date() });
+      await storage.updateUser(user.id, { lastLogin: new Date() } as any);
 
       // Log audit
       await storage.createAuditLog({

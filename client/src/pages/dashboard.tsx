@@ -64,7 +64,7 @@ export default function Dashboard() {
         <main className="flex-1 overflow-auto p-6">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Dashboard Overview</h2>
-            <p className="text-erkas-secondary">Periode Anggaran 2024 - SMK Negeri 1 Jakarta</p>
+            <p className="text-erkas-secondary">SMPN 25 Jakarta - Periode Anggaran 2024-2030</p>
           </div>
 
           {/* Stats Cards */}
