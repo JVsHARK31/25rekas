@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -24,10 +24,19 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { DashboardStats } from "@/types/rkas";
 import { calculateReferenceStats } from "@/lib/mock-data-reference";
+import PeriodSelector, { PeriodType, Quarter, Month } from "@/components/dashboard/period-selector";
+import AdvancedStatsGrid from "@/components/dashboard/advanced-stats-grid";
+import ResponsiveChartSection from "@/components/dashboard/responsive-chart-section";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Period selection state
+  const [selectedPeriodType, setSelectedPeriodType] = useState<PeriodType>('quarterly');
+  const [selectedQuarter, setSelectedQuarter] = useState<Quarter>('TW1');
+  const [selectedMonth, setSelectedMonth] = useState<Month>(1);
+  const [selectedYear, setSelectedYear] = useState(2025);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -90,226 +99,152 @@ export default function Dashboard() {
             </AlertDescription>
           </Alert>
 
-          {/* Stats Cards - 4x2 Grid Layout matching reference design */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            {/* Row 1 */}
-            {/* Total Kegiatan */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Total Kegiatan</p>
-                    <div className="text-2xl font-bold text-blue-600">
-                      {statsLoading ? (
-                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
-                      ) : (
-                        stats.totalActivities
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Kegiatan RKAS terdaftar</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-blue-50">
-                    <FileText className="h-4 w-4 text-blue-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Advanced Period Selector */}
+          <PeriodSelector
+            selectedPeriodType={selectedPeriodType}
+            selectedQuarter={selectedQuarter}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onPeriodTypeChange={setSelectedPeriodType}
+            onQuarterChange={setSelectedQuarter}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+          />
 
-            {/* Total Anggaran */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Total Anggaran</p>
-                    <div className="text-2xl font-bold text-green-600">
-                      {statsLoading ? (
-                        <div className="animate-pulse h-8 w-24 bg-gray-200 rounded" />
-                      ) : (
-                        formatCurrency(stats.totalBudget)
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Anggaran keseluruhan</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-green-50">
-                    <DollarSign className="h-4 w-4 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Advanced Stats Grid with Period-based Data */}
+          <AdvancedStatsGrid
+            periodType={selectedPeriodType}
+            selectedQuarter={selectedQuarter}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+          />
 
-            {/* Kegiatan Disetujui */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Kegiatan Disetujui</p>
-                    <div className="text-2xl font-bold text-emerald-600">
-                      {statsLoading ? (
-                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
-                      ) : (
-                        stats.approvedActivities
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Sudah mendapat persetujuan</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-emerald-50">
-                    <CheckCircle className="h-4 w-4 text-emerald-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Responsive Chart Section */}
+          <ResponsiveChartSection
+            periodType={selectedPeriodType}
+            selectedQuarter={selectedQuarter}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+          />
 
-            {/* Menunggu Persetujuan */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Menunggu Persetujuan</p>
-                    <div className="text-2xl font-bold text-orange-600">
-                      {statsLoading ? (
-                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
-                      ) : (
-                        stats.pendingActivities
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Dalam proses review</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-orange-50">
-                    <Clock className="h-4 w-4 text-orange-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Stats Cards - Second Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Realisasi Anggaran */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Realisasi Anggaran</p>
-                    <div className="text-2xl font-bold text-purple-600">
-                      {statsLoading ? (
-                        <div className="animate-pulse h-8 w-24 bg-gray-200 rounded" />
-                      ) : (
-                        formatCurrency(stats.realizedBudget)
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{stats.budgetUtilization.toFixed(1)}% dari total</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-purple-50">
-                    <TrendingUp className="h-4 w-4 text-purple-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Kegiatan Terlambat */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Kegiatan Terlambat</p>
-                    <div className="text-2xl font-bold text-red-600">
-                      {statsLoading ? (
-                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
-                      ) : (
-                        stats.lateActivities
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Perlu perhatian khusus</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-red-50">
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Target Capaian */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Target Capaian</p>
-                    <div className="text-2xl font-bold text-indigo-600">85%</div>
-                    <p className="text-xs text-gray-500 mt-1">Target semester ini</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-indigo-50">
-                    <Target className="h-4 w-4 text-indigo-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Aktivitas Hari Ini */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium mb-1">Aktivitas Hari Ini</p>
-                    <div className="text-2xl font-bold text-teal-600">12</div>
-                    <p className="text-xs text-gray-500 mt-1">Update dan perubahan</p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-teal-50">
-                    <Zap className="h-4 w-4 text-teal-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Additional Dashboard Content */}
+          {/* Enhanced Dashboard Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Aktivitas Terbaru</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">Pengembangan Perpustakaan</p>
-                        <p className="text-sm text-gray-600">Status: Disetujui</p>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <ClipboardList className="h-5 w-5 text-blue-600" />
+                    <span>Aktivitas Terbaru</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-4 p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200">
+                      <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="h-5 w-5 text-white" />
                       </div>
-                      <span className="text-sm text-green-600 font-medium">2 jam lalu</span>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-green-900">Pengembangan Perpustakaan</h4>
+                        <p className="text-sm text-green-700 mb-2">Status: Disetujui - Anggaran Rp 11,000,000</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">Bidang Kurikulum</span>
+                          <span className="text-sm text-green-600 font-medium">2 jam lalu</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">Kegiatan Ekstrakurikuler</p>
-                        <p className="text-sm text-gray-600">Status: Menunggu Review</p>
+
+                    <div className="flex items-start space-x-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                      <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Clock className="h-5 w-5 text-white" />
                       </div>
-                      <span className="text-sm text-orange-600 font-medium">4 jam lalu</span>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-orange-900">Kegiatan Ekstrakurikuler</h4>
+                        <p className="text-sm text-orange-700 mb-2">Status: Menunggu Review - Anggaran Rp 8,000,000</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded">Bidang Kesiswaan</span>
+                          <span className="text-sm text-orange-600 font-medium">4 jam lalu</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">Pemeliharaan Gedung</p>
-                        <p className="text-sm text-gray-600">Status: Draft</p>
+
+                    <div className="flex items-start space-x-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+                      <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Edit className="h-5 w-5 text-white" />
                       </div>
-                      <span className="text-sm text-gray-600 font-medium">1 hari lalu</span>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">Pemeliharaan Gedung</h4>
+                        <p className="text-sm text-gray-700 mb-2">Status: Draft - Anggaran Rp 30,000,000</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded">Sarana Prasarana</span>
+                          <span className="text-sm text-gray-600 font-medium">1 hari lalu</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
+
+                  <button className="w-full mt-6 text-sm text-blue-600 hover:text-blue-800 font-medium py-3 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+                    Lihat Semua Aktivitas →
+                  </button>
                 </CardContent>
               </Card>
             </div>
             
             <div>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-                  <div className="space-y-3">
-                    <button className="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
-                      <p className="font-medium text-blue-900">Tambah Kegiatan RKAS</p>
-                      <p className="text-sm text-blue-600">Buat kegiatan baru</p>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Zap className="h-5 w-5 text-purple-600" />
+                    <span>Quick Actions</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <button className="w-full text-left p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-lg transition-all duration-200 border border-blue-200 group">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <FileText className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-blue-900">Tambah Kegiatan RKAS</p>
+                          <p className="text-sm text-blue-600">Buat kegiatan baru</p>
+                        </div>
+                      </div>
                     </button>
-                    <button className="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
-                      <p className="font-medium text-green-900">Export Laporan</p>
-                      <p className="text-sm text-green-600">Download laporan RKAS</p>
+
+                    <button className="w-full text-left p-4 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-lg transition-all duration-200 border border-green-200 group">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <TrendingUp className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-green-900">Export Laporan</p>
+                          <p className="text-sm text-green-600">Download laporan RKAS</p>
+                        </div>
+                      </div>
                     </button>
-                    <button className="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-                      <p className="font-medium text-purple-900">Import Data</p>
-                      <p className="text-sm text-purple-600">Upload file Excel</p>
+
+                    <button className="w-full text-left p-4 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 rounded-lg transition-all duration-200 border border-purple-200 group">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Upload className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-purple-900">Import Data</p>
+                          <p className="text-sm text-purple-600">Upload file Excel</p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button className="w-full text-left p-4 bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 rounded-lg transition-all duration-200 border border-orange-200 group">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Target className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-orange-900">Monitoring</p>
+                          <p className="text-sm text-orange-600">Pantau progress real-time</p>
+                        </div>
+                      </div>
                     </button>
                   </div>
                 </CardContent>
