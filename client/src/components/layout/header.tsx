@@ -1,7 +1,6 @@
-import { Bell, ChevronDown } from "lucide-react";
-import { School } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { LogOut, User, Bell, Settings } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,78 +8,74 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/hooks/use-auth";
+import { Badge } from "@/components/ui/badge";
 
 export default function Header() {
   const { user, logout } = useAuth();
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const getRoleDisplay = (role: string) => {
-    const roleMap = {
-      'super_admin': 'Super Admin',
-      'operator': 'Operator',
-      'viewer': 'Viewer'
-    };
-    return roleMap[role as keyof typeof roleMap] || role;
+  const handleLogout = () => {
+    logout();
   };
 
   return (
-    <header className="bg-white border-b border-slate-200 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="h-10 w-10 bg-erkas-primary rounded-lg flex items-center justify-center">
-            <School className="text-white" size={20} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900">eRKAS Pro</h1>
-            <p className="text-sm text-erkas-secondary">Sistem Manajemen Anggaran Sekolah</p>
-          </div>
+    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6">
+      {/* Logo and Title */}
+      <div className="flex items-center space-x-4">
+        <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+          25
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">RKAS Jakarta</h1>
+          <p className="text-sm text-slate-600">SMPN 25 Jakarta</p>
+        </div>
+        <Badge variant="secondary" className="bg-green-100 text-green-800 font-medium">
+          2025
+        </Badge>
+      </div>
+
+      {/* Right side */}
+      <div className="flex items-center space-x-4">
+        {/* System Demo Notice */}
+        <div className="bg-blue-50 border border-blue-200 px-3 py-1 rounded-md">
+          <p className="text-xs text-blue-700 font-medium">
+            Sistem Demo - Data Simulasi
+          </p>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Button variant="ghost" size="sm" className="p-2 text-slate-400 hover:text-slate-600 relative">
-              <Bell size={20} />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                3
-              </Badge>
+        {/* Notifications */}
+        <Button variant="ghost" size="sm" className="relative">
+          <Bell size={18} />
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+            3
+          </Badge>
+        </Button>
+
+        {/* User Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
+                <User size={16} />
+              </div>
+              <span className="text-sm font-medium">{user?.fullName || "Admin"}</span>
             </Button>
-          </div>
-
-          <div className="flex items-center space-x-3 border-l border-slate-200 pl-4">
-            <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-              {user && getInitials(user.fullName)}
-            </div>
-            <div className="text-sm">
-              <p className="font-medium text-slate-900">{user?.fullName}</p>
-              <p className="text-erkas-secondary">{user && getRoleDisplay(user.role)}</p>
-            </div>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-slate-600">
-                  <ChevronDown size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-red-600">
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              Profil Saya
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              Pengaturan
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+              <LogOut className="mr-2 h-4 w-4" />
+              Keluar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

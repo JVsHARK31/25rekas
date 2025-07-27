@@ -13,15 +13,17 @@ import {
   FileText,
   DollarSign,
   Target,
-  Zap
+  Zap,
+  Info
 } from "lucide-react";
 
 import Header from "@/components/layout/header";
 import Sidebar from "@/components/layout/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { DashboardStats } from "@/types/rkas";
-import { getBudgetYearsDescending, formatBudgetPeriod } from "@/lib/budget-years";
+import { calculateReferenceStats } from "@/lib/mock-data-reference";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -34,10 +36,9 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, authLoading, setLocation]);
 
-  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ['/api/dashboard/stats'],
-    enabled: isAuthenticated,
-  });
+  // Use reference mock data for exact replica
+  const stats = calculateReferenceStats();
+  const statsLoading = false;
 
   if (authLoading || !isAuthenticated) {
     return (
@@ -71,113 +72,110 @@ export default function Dashboard() {
           {/* Header with Year Badge */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Dashboard RKAS</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Dashboard RKAS Jakarta</h2>
               <p className="text-slate-600">Selamat datang di Sistem RKAS SMPN 25 Jakarta</p>
             </div>
-            <div className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium">
-              Tahun Anggaran 2025
-              <div className="text-xs opacity-90">Status: Aktif</div>
+            <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg">
+              <p className="text-sm font-medium">Tahun Anggaran 2025</p>
+              <p className="text-xs opacity-90">Status: Aktif</p>
             </div>
           </div>
 
-          {/* System Demo Notice */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start">
-            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
-              <span className="text-white text-xs font-bold">i</span>
-            </div>
-            <div>
-              <p className="text-blue-800 text-sm">
-                <strong>Sistem Demo:</strong> Anda sedang menggunakan sistem demo RKAS dengan data simulasi SMPN 25 Jakarta. 
-                Semua fitur dapat digunakan untuk keperluan evaluasi dan pelatihan.
-              </p>
-            </div>
-          </div>
+          {/* System Demo Notice - Matching reference design */}
+          <Alert className="border-green-200 bg-green-50 mb-6">
+            <Info className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              <strong>Sistem Demo:</strong> Anda sedang menggunakan sistem demo RKAS dengan data simulasi SMPN 25 Jakarta.
+              Semua fitur dapat digunakan untuk keperluan evaluasi dan pelatihan.
+            </AlertDescription>
+          </Alert>
 
-          {/* Stats Cards - First Row */}
+          {/* Stats Cards - 4x2 Grid Layout matching reference design */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {/* Row 1 */}
             {/* Total Kegiatan */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Total Kegiatan</p>
-                    <div className="text-3xl font-bold text-blue-600">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Total Kegiatan</p>
+                    <div className="text-2xl font-bold text-blue-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-8 w-12" />
+                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
                       ) : (
-                        "0"
+                        stats.totalActivities
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">Kegiatan RKAS terdaftar</p>
+                    <p className="text-xs text-gray-500 mt-1">Kegiatan RKAS terdaftar</p>
                   </div>
-                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="text-blue-600" size={24} />
+                  <div className="p-2 rounded-lg bg-blue-50">
+                    <FileText className="h-4 w-4 text-blue-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Total Anggaran */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Total Anggaran</p>
-                    <div className="text-3xl font-bold text-green-600">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Total Anggaran</p>
+                    <div className="text-2xl font-bold text-green-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-8 w-24" />
+                        <div className="animate-pulse h-8 w-24 bg-gray-200 rounded" />
                       ) : (
-                        "Rp 0"
+                        formatCurrency(stats.totalBudget)
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">Anggaran keseluruhan</p>
+                    <p className="text-xs text-gray-500 mt-1">Anggaran keseluruhan</p>
                   </div>
-                  <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <DollarSign className="text-green-600" size={24} />
+                  <div className="p-2 rounded-lg bg-green-50">
+                    <DollarSign className="h-4 w-4 text-green-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Kegiatan Disetujui */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Kegiatan Disetujui</p>
-                    <div className="text-3xl font-bold text-green-600">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Kegiatan Disetujui</p>
+                    <div className="text-2xl font-bold text-emerald-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-8 w-12" />
+                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
                       ) : (
-                        "0"
+                        stats.approvedActivities
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">Sudah mendapat persetujuan</p>
+                    <p className="text-xs text-gray-500 mt-1">Sudah mendapat persetujuan</p>
                   </div>
-                  <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="text-green-600" size={24} />
+                  <div className="p-2 rounded-lg bg-emerald-50">
+                    <CheckCircle className="h-4 w-4 text-emerald-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Menunggu Persetujuan */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Menunggu Persetujuan</p>
-                    <div className="text-3xl font-bold text-orange-600">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Menunggu Persetujuan</p>
+                    <div className="text-2xl font-bold text-orange-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-8 w-12" />
+                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
                       ) : (
-                        "0"
+                        stats.pendingActivities
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">Dalam proses review</p>
+                    <p className="text-xs text-gray-500 mt-1">Dalam proses review</p>
                   </div>
-                  <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Clock className="text-orange-600" size={24} />
+                  <div className="p-2 rounded-lg bg-orange-50">
+                    <Clock className="h-4 w-4 text-orange-600" />
                   </div>
                 </div>
               </CardContent>
@@ -187,167 +185,136 @@ export default function Dashboard() {
           {/* Stats Cards - Second Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Realisasi Anggaran */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Realisasi Anggaran</p>
-                    <div className="text-3xl font-bold text-purple-600">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Realisasi Anggaran</p>
+                    <div className="text-2xl font-bold text-purple-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-8 w-24" />
+                        <div className="animate-pulse h-8 w-24 bg-gray-200 rounded" />
                       ) : (
-                        "Rp 0"
+                        formatCurrency(stats.realizedBudget)
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">0.0% dari total</p>
+                    <p className="text-xs text-gray-500 mt-1">{stats.budgetUtilization.toFixed(1)}% dari total</p>
                   </div>
-                  <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <TrendingUp className="text-purple-600" size={24} />
+                  <div className="p-2 rounded-lg bg-purple-50">
+                    <TrendingUp className="h-4 w-4 text-purple-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Kegiatan Terlambat */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Kegiatan Terlambat</p>
-                    <div className="text-3xl font-bold text-red-600">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Kegiatan Terlambat</p>
+                    <div className="text-2xl font-bold text-red-600">
                       {statsLoading ? (
-                        <div className="erkas-loading h-8 w-12" />
+                        <div className="animate-pulse h-8 w-12 bg-gray-200 rounded" />
                       ) : (
-                        "0"
+                        stats.lateActivities
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">Perlu perhatian khusus</p>
+                    <p className="text-xs text-gray-500 mt-1">Perlu perhatian khusus</p>
                   </div>
-                  <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <AlertTriangle className="text-red-600" size={24} />
+                  <div className="p-2 rounded-lg bg-red-50">
+                    <AlertTriangle className="h-4 w-4 text-red-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Target Capaian */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Target Capaian</p>
-                    <div className="text-3xl font-bold text-blue-600">
-                      {statsLoading ? (
-                        <div className="erkas-loading h-8 w-12" />
-                      ) : (
-                        "0%"
-                      )}
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">Target semester ini</p>
+                    <p className="text-sm text-gray-600 font-medium mb-1">Target Capaian</p>
+                    <div className="text-2xl font-bold text-indigo-600">85%</div>
+                    <p className="text-xs text-gray-500 mt-1">Target semester ini</p>
                   </div>
-                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Target className="text-blue-600" size={24} />
+                  <div className="p-2 rounded-lg bg-indigo-50">
+                    <Target className="h-4 w-4 text-indigo-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Aktivitas Hari Ini */}
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-500 mb-1">Aktivitas Hari Ini</p>
-                    <div className="text-3xl font-bold text-teal-600">
-                      {statsLoading ? (
-                        <div className="erkas-loading h-8 w-12" />
-                      ) : (
-                        "12"
-                      )}
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">Update dan perubahan</p>
+                    <p className="text-sm text-gray-600 font-medium mb-1">Aktivitas Hari Ini</p>
+                    <div className="text-2xl font-bold text-teal-600">12</div>
+                    <p className="text-xs text-gray-500 mt-1">Update dan perubahan</p>
                   </div>
-                  <div className="h-12 w-12 bg-teal-100 rounded-full flex items-center justify-center">
-                    <Zap className="text-teal-600" size={24} />
+                  <div className="p-2 rounded-lg bg-teal-50">
+                    <Zap className="h-4 w-4 text-teal-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Charts and Recent Activity */}
-          <div className="grid lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold text-slate-900">
-                    Alokasi Anggaran per Bidang
-                  </CardTitle>
-                  <select className="text-sm border border-slate-300 rounded-lg px-3 py-2">
-                    {getBudgetYearsDescending().map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 bg-slate-50 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-4xl text-slate-400 mb-4">📊</div>
-                    <p className="text-erkas-secondary">Budget Allocation Chart</p>
-                    <p className="text-xs text-slate-400 mt-2">Chart implementation coming soon</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-slate-900">
-                  Aktivitas Terbaru
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Edit className="text-erkas-primary text-xs" size={14} />
+          {/* Additional Dashboard Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Aktivitas Terbaru</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">Pengembangan Perpustakaan</p>
+                        <p className="text-sm text-gray-600">Status: Disetujui</p>
+                      </div>
+                      <span className="text-sm text-green-600 font-medium">2 jam lalu</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900">Data RKAS diperbarui</p>
-                      <p className="text-xs text-erkas-secondary">Bidang Kurikulum - Pengembangan Standar Isi</p>
-                      <p className="text-xs text-slate-400 mt-1">2 menit yang lalu</p>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">Kegiatan Ekstrakurikuler</p>
+                        <p className="text-sm text-gray-600">Status: Menunggu Review</p>
+                      </div>
+                      <span className="text-sm text-orange-600 font-medium">4 jam lalu</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">Pemeliharaan Gedung</p>
+                        <p className="text-sm text-gray-600">Status: Draft</p>
+                      </div>
+                      <span className="text-sm text-gray-600 font-medium">1 hari lalu</span>
                     </div>
                   </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Check className="text-erkas-success text-xs" size={14} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900">Pengajuan disetujui</p>
-                      <p className="text-xs text-erkas-secondary">Revisi anggaran Q2 2024</p>
-                      <p className="text-xs text-slate-400 mt-1">15 menit yang lalu</p>
-                    </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+                  <div className="space-y-3">
+                    <button className="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                      <p className="font-medium text-blue-900">Tambah Kegiatan RKAS</p>
+                      <p className="text-sm text-blue-600">Buat kegiatan baru</p>
+                    </button>
+                    <button className="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                      <p className="font-medium text-green-900">Export Laporan</p>
+                      <p className="text-sm text-green-600">Download laporan RKAS</p>
+                    </button>
+                    <button className="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                      <p className="font-medium text-purple-900">Import Data</p>
+                      <p className="text-sm text-purple-600">Upload file Excel</p>
+                    </button>
                   </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Upload className="text-yellow-600 text-xs" size={14} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900">File dokumen diunggah</p>
-                      <p className="text-xs text-erkas-secondary">RAB_Perpustakaan_2024.pdf</p>
-                      <p className="text-xs text-slate-400 mt-1">1 jam yang lalu</p>
-                    </div>
-                  </div>
-                </div>
-
-                <button className="w-full mt-4 text-sm text-erkas-primary hover:text-blue-700 font-medium py-2">
-                  Lihat Semua Aktivitas
-                </button>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </div>
