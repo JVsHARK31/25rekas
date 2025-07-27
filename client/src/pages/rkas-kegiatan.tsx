@@ -17,9 +17,24 @@ import {
   Edit,
   Trash2,
   Eye,
-  Download
+  Download,
+  AlertTriangle
 } from "lucide-react";
 import PeriodSelector, { PeriodType, Quarter, Month } from "@/components/dashboard/period-selector";
+import KegiatanForm from "@/components/forms/kegiatan-form";
+import { useKegiatan } from "@/hooks/use-kegiatan";
+import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface RKASActivity {
   id: string;
@@ -77,44 +92,11 @@ export default function RKASKegiatan() {
     }
   };
 
-  // Mock data for activities with period-specific filtering
-  const generateMockActivities = (): RKASActivity[] => {
-    const bidangList = [
-      'Kurikulum', 'Kesiswaan', 'Sarana Prasarana', 'Pendidik & Tenaga',
-      'Pembiayaan', 'Budaya Sekolah', 'Kemitraan', 'Evaluasi'
-    ];
-    
-    const activities: RKASActivity[] = [];
-    
-    for (let i = 1; i <= 50; i++) {
-      const bidang = bidangList[Math.floor(Math.random() * bidangList.length)];
-      const quarter = ['TW1', 'TW2', 'TW3', 'TW4'][Math.floor(Math.random() * 4)] as Quarter;
-      const month = (Math.floor(Math.random() * 12) + 1) as Month;
-      const status = ['approved', 'pending', 'draft', 'rejected'][Math.floor(Math.random() * 4)] as any;
-      
-      activities.push({
-        id: `activity-${i}`,
-        name: `Kegiatan ${bidang} ${i}`,
-        bidang,
-        standard: `Standar ${i}`,
-        budget: Math.floor(Math.random() * 50000000) + 5000000,
-        status,
-        quarter,
-        month,
-        year: selectedYear,
-        createdAt: new Date().toISOString(),
-        description: `Deskripsi kegiatan ${bidang} untuk periode yang dipilih`,
-        responsible: `PIC Bidang ${bidang}`
-      });
-    }
-    
-    return activities;
-  };
-
-  const mockActivities = generateMockActivities();
+  // Use real CRUD operations
+  const { activities, loading, createActivity, updateActivity, deleteActivity } = useKegiatan();
 
   // Filter activities based on selected period
-  const filteredActivities = mockActivities.filter(activity => {
+  const filteredActivities = activities.filter(activity => {
     const matchesSearch = activity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          activity.bidang.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || activity.status === statusFilter;
@@ -130,6 +112,19 @@ export default function RKASKegiatan() {
 
     return matchesSearch && matchesStatus && matchesBidang && matchesYear && matchesPeriod;
   });
+
+  // Handle CRUD operations
+  const handleCreateActivity = async (data: any) => {
+    await createActivity(data);
+  };
+
+  const handleUpdateActivity = async (id: string, data: any) => {
+    await updateActivity(id, data);
+  };
+
+  const handleDeleteActivity = async (id: string) => {
+    await deleteActivity(id);
+  };
 
   const getPeriodLabel = () => {
     if (selectedPeriodType === 'quarterly') {
@@ -169,10 +164,14 @@ export default function RKASKegiatan() {
                   <Calendar className="h-3 w-3" />
                   <span>{filteredActivities.length} Kegiatan</span>
                 </Badge>
-                <Button className="flex items-center space-x-2">
-                  <Plus className="h-4 w-4" />
-                  <span>Tambah Kegiatan</span>
-                </Button>
+                <KegiatanForm
+                  mode="create"
+                  onSubmit={handleCreateActivity}
+                  selectedYear={selectedYear}
+                  selectedQuarter={selectedQuarter}
+                  selectedMonth={selectedMonth}
+                  periodType={selectedPeriodType}
+                />
               </div>
             </div>
           </div>
@@ -256,7 +255,7 @@ export default function RKASKegiatan() {
                   <span>Daftar Kegiatan - {getPeriodLabel()} {selectedYear}</span>
                 </div>
                 <Badge variant="outline">
-                  {filteredActivities.length} dari {mockActivities.length} kegiatan
+                  {filteredActivities.length} dari {activities.length} kegiatan
                 </Badge>
               </CardTitle>
             </CardHeader>
@@ -268,10 +267,20 @@ export default function RKASKegiatan() {
                   <p className="text-gray-500">
                     Tidak ada kegiatan yang ditemukan untuk periode {getPeriodLabel()} {selectedYear}
                   </p>
-                  <Button className="mt-4">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Tambah Kegiatan Pertama
-                  </Button>
+                  <KegiatanForm
+                    mode="create"
+                    onSubmit={handleCreateActivity}
+                    selectedYear={selectedYear}
+                    selectedQuarter={selectedQuarter}
+                    selectedMonth={selectedMonth}
+                    periodType={selectedPeriodType}
+                    trigger={
+                      <Button className="mt-4">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Tambah Kegiatan Pertama
+                      </Button>
+                    }
+                  />
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -335,15 +344,51 @@ export default function RKASKegiatan() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <div className="flex items-center space-x-2">
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" title="Lihat Detail">
                                   <Eye className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <KegiatanForm
+                                  mode="edit"
+                                  initialData={activity}
+                                  onSubmit={(data) => handleUpdateActivity(activity.id, data)}
+                                  selectedYear={selectedYear}
+                                  selectedQuarter={selectedQuarter}
+                                  selectedMonth={selectedMonth}
+                                  periodType={selectedPeriodType}
+                                  trigger={
+                                    <Button variant="ghost" size="sm" title="Edit Kegiatan">
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                  }
+                                />
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" title="Hapus Kegiatan">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle className="flex items-center space-x-2">
+                                        <AlertTriangle className="h-5 w-5 text-red-600" />
+                                        <span>Konfirmasi Hapus</span>
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Apakah Anda yakin ingin menghapus kegiatan "{activity.name}"? 
+                                        Tindakan ini tidak dapat dibatalkan.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                                      <AlertDialogAction 
+                                        className="bg-red-600 hover:bg-red-700"
+                                        onClick={() => handleDeleteActivity(activity.id)}
+                                      >
+                                        Hapus
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
                             </td>
                           </tr>

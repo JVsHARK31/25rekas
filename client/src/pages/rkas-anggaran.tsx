@@ -20,9 +20,25 @@ import {
   Download,
   BarChart3,
   Target,
-  PieChart
+  PieChart,
+  Trash2,
+  AlertTriangle
 } from "lucide-react";
 import PeriodSelector, { PeriodType, Quarter, Month } from "@/components/dashboard/period-selector";
+import AnggaranForm from "@/components/forms/anggaran-form";
+import { useAnggaran } from "@/hooks/use-anggaran";
+import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface BudgetItem {
   id: string;
@@ -79,53 +95,11 @@ export default function RKASAnggaran() {
     }
   };
 
-  // Mock data for budget items with period-specific filtering
-  const generateMockBudgetItems = (): BudgetItem[] => {
-    const bidangList = [
-      'Kurikulum', 'Kesiswaan', 'Sarana Prasarana', 'Pendidik & Tenaga',
-      'Pembiayaan', 'Budaya Sekolah', 'Kemitraan', 'Evaluasi'
-    ];
-    
-    const budgetItems: BudgetItem[] = [];
-    
-    for (let i = 1; i <= 40; i++) {
-      const bidang = bidangList[Math.floor(Math.random() * bidangList.length)];
-      const quarter = ['TW1', 'TW2', 'TW3', 'TW4'][Math.floor(Math.random() * 4)] as Quarter;
-      const month = (Math.floor(Math.random() * 12) + 1) as Month;
-      const allocatedBudget = Math.floor(Math.random() * 80000000) + 10000000;
-      const usedBudget = Math.floor(allocatedBudget * (0.2 + Math.random() * 0.7)); // 20-90% used
-      const remainingBudget = allocatedBudget - usedBudget;
-      
-      let status: 'on-track' | 'over-budget' | 'under-budget';
-      const usagePercentage = (usedBudget / allocatedBudget) * 100;
-      if (usagePercentage > 95) status = 'over-budget';
-      else if (usagePercentage < 50) status = 'under-budget';
-      else status = 'on-track';
-      
-      budgetItems.push({
-        id: `budget-${i}`,
-        activity: `Anggaran ${bidang} ${i}`,
-        bidang,
-        standard: `Standar ${i}`,
-        allocatedBudget,
-        usedBudget,
-        remainingBudget,
-        quarter,
-        month,
-        year: selectedYear,
-        status,
-        responsible: `Koordinator ${bidang}`,
-        lastUpdated: new Date().toISOString()
-      });
-    }
-    
-    return budgetItems;
-  };
-
-  const mockBudgetItems = generateMockBudgetItems();
+  // Use real CRUD operations
+  const { budgetItems, loading, createBudgetItem, updateBudgetItem, deleteBudgetItem } = useAnggaran();
 
   // Filter budget items based on selected period
-  const filteredBudgetItems = mockBudgetItems.filter(item => {
+  const filteredBudgetItems = budgetItems.filter(item => {
     const matchesSearch = item.activity.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.bidang.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
@@ -141,6 +115,19 @@ export default function RKASAnggaran() {
 
     return matchesSearch && matchesStatus && matchesBidang && matchesYear && matchesPeriod;
   });
+
+  // Handle CRUD operations
+  const handleCreateBudgetItem = async (data: any) => {
+    await createBudgetItem(data);
+  };
+
+  const handleUpdateBudgetItem = async (id: string, data: any) => {
+    await updateBudgetItem(id, data);
+  };
+
+  const handleDeleteBudgetItem = async (id: string) => {
+    await deleteBudgetItem(id);
+  };
 
   const getPeriodLabel = () => {
     if (selectedPeriodType === 'quarterly') {
@@ -186,10 +173,14 @@ export default function RKASAnggaran() {
                   <DollarSign className="h-3 w-3" />
                   <span>{formatCurrency(totalAllocated)}</span>
                 </Badge>
-                <Button className="flex items-center space-x-2">
-                  <Plus className="h-4 w-4" />
-                  <span>Tambah Anggaran</span>
-                </Button>
+                <AnggaranForm
+                  mode="create"
+                  onSubmit={handleCreateBudgetItem}
+                  selectedYear={selectedYear}
+                  selectedQuarter={selectedQuarter}
+                  selectedMonth={selectedMonth}
+                  periodType={selectedPeriodType}
+                />
               </div>
             </div>
           </div>
@@ -345,7 +336,7 @@ export default function RKASAnggaran() {
                   <span>Rincian Anggaran - {getPeriodLabel()} {selectedYear}</span>
                 </div>
                 <Badge variant="outline">
-                  {filteredBudgetItems.length} dari {mockBudgetItems.length} item
+                  {filteredBudgetItems.length} dari {budgetItems.length} item
                 </Badge>
               </CardTitle>
             </CardHeader>
@@ -357,10 +348,20 @@ export default function RKASAnggaran() {
                   <p className="text-gray-500">
                     Tidak ada anggaran yang ditemukan untuk periode {getPeriodLabel()} {selectedYear}
                   </p>
-                  <Button className="mt-4">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Tambah Anggaran Pertama
-                  </Button>
+                  <AnggaranForm
+                    mode="create"
+                    onSubmit={handleCreateBudgetItem}
+                    selectedYear={selectedYear}
+                    selectedQuarter={selectedQuarter}
+                    selectedMonth={selectedMonth}
+                    periodType={selectedPeriodType}
+                    trigger={
+                      <Button className="mt-4">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Tambah Anggaran Pertama
+                      </Button>
+                    }
+                  />
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -436,12 +437,51 @@ export default function RKASAnggaran() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <div className="flex items-center space-x-2">
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" title="Lihat Detail">
                                   <Eye className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
-                                  <Edit className="h-4 w-4" />
-                                </Button>
+                                <AnggaranForm
+                                  mode="edit"
+                                  initialData={item}
+                                  onSubmit={(data) => handleUpdateBudgetItem(item.id, data)}
+                                  selectedYear={selectedYear}
+                                  selectedQuarter={selectedQuarter}
+                                  selectedMonth={selectedMonth}
+                                  periodType={selectedPeriodType}
+                                  trigger={
+                                    <Button variant="ghost" size="sm" title="Edit Anggaran">
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                  }
+                                />
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" title="Hapus Anggaran">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle className="flex items-center space-x-2">
+                                        <AlertTriangle className="h-5 w-5 text-red-600" />
+                                        <span>Konfirmasi Hapus</span>
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Apakah Anda yakin ingin menghapus anggaran "{item.activity}"? 
+                                        Tindakan ini tidak dapat dibatalkan.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                                      <AlertDialogAction 
+                                        className="bg-red-600 hover:bg-red-700"
+                                        onClick={() => handleDeleteBudgetItem(item.id)}
+                                      >
+                                        Hapus
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
                             </td>
                           </tr>

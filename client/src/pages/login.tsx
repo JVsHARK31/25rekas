@@ -127,15 +127,7 @@ export default function Login() {
               </Button>
             </form>
             
-            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-              <p className="text-sm font-medium text-slate-700 mb-2">
-                Kredensial Demo SMPN 25 Jakarta:
-              </p>
-              <div className="space-y-1 text-sm text-slate-600">
-                <p><strong>Email:</strong> admin@rkas.com</p>
-                <p><strong>Password:</strong> 123456</p>
-              </div>
-            </div>
+
 
             <div className="text-center text-xs text-slate-500 border-t pt-4">
               <p>© 2024 Pemerintah Provinsi DKI Jakarta</p>
