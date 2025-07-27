@@ -8,7 +8,7 @@ async function throwIfResNotOk(res: Response) {
 }
 
 function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('erkas_token');
   const headers: HeadersInit = {};
   
   if (token) {

@@ -21,9 +21,9 @@ export default function RkasManagement() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [filters, setFilters] = useState({
-    bidang: "",
-    dana: "",
-    status: "",
+    bidang: "all",
+    dana: "all",
+    status: "all",
     search: "",
   });
 
@@ -103,7 +103,7 @@ export default function RkasManagement() {
                       <SelectValue placeholder="Semua Bidang" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Semua Bidang</SelectItem>
+                      <SelectItem value="all">Semua Bidang</SelectItem>
                       <SelectItem value="01">01 - Kurikulum</SelectItem>
                       <SelectItem value="02">02 - Kesiswaan</SelectItem>
                       <SelectItem value="03">03 - Sarana & Prasarana</SelectItem>
@@ -118,7 +118,7 @@ export default function RkasManagement() {
                       <SelectValue placeholder="Semua Dana" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Semua Dana</SelectItem>
+                      <SelectItem value="all">Semua Dana</SelectItem>
                       <SelectItem value="bop">BOP Reguler</SelectItem>
                       <SelectItem value="bos">BOS Reguler</SelectItem>
                       <SelectItem value="dak">DAK Fisik</SelectItem>
@@ -133,7 +133,7 @@ export default function RkasManagement() {
                       <SelectValue placeholder="Semua Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Semua Status</SelectItem>
+                      <SelectItem value="all">Semua Status</SelectItem>
                       <SelectItem value="draft">Draft</SelectItem>
                       <SelectItem value="submitted">Submitted</SelectItem>
                       <SelectItem value="approved">Approved</SelectItem>

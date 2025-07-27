@@ -16,7 +16,7 @@ interface UserTableProps {
 
 export default function UserTable({ users }: UserTableProps) {
   const [filters, setFilters] = useState({
-    role: "",
+    role: "all",
     search: "",
   });
   const queryClient = useQueryClient();
@@ -50,7 +50,7 @@ export default function UserTable({ users }: UserTableProps) {
       user.email.toLowerCase().includes(filters.search.toLowerCase()) ||
       user.username.toLowerCase().includes(filters.search.toLowerCase());
     
-    const matchesRole = !filters.role || user.role === filters.role;
+    const matchesRole = filters.role === "all" || !filters.role || user.role === filters.role;
     
     return matchesSearch && matchesRole;
   });
@@ -135,7 +135,7 @@ export default function UserTable({ users }: UserTableProps) {
               <SelectValue placeholder="Semua Role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Role</SelectItem>
+              <SelectItem value="all">Semua Role</SelectItem>
               <SelectItem value="super_admin">Super Admin</SelectItem>
               <SelectItem value="operator">Operator</SelectItem>
               <SelectItem value="viewer">Viewer</SelectItem>

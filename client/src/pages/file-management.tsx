@@ -21,7 +21,7 @@ export default function FileManagement() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [filters, setFilters] = useState({
-    category: "",
+    category: "all",
     search: "",
   });
 
@@ -107,7 +107,7 @@ export default function FileManagement() {
                         <SelectValue placeholder="Semua Kategori" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Semua Kategori</SelectItem>
+                        <SelectItem value="all">Semua Kategori</SelectItem>
                         <SelectItem value="RAB">RAB</SelectItem>
                         <SelectItem value="TOR">TOR</SelectItem>
                         <SelectItem value="Proposal">Proposal</SelectItem>
