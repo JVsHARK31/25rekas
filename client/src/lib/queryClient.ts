@@ -18,6 +18,12 @@ function getAuthHeaders(): HeadersInit {
   return headers;
 }
 
+// API Configuration for deployment
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+                    (import.meta.env.MODE === 'production' 
+                      ? 'https://erkas-pro-api.vercel.app' 
+                      : 'http://localhost:5000');
+
 export async function apiRequest(
   method: string,
   url: string,
@@ -28,7 +34,10 @@ export async function apiRequest(
     ...(data ? { "Content-Type": "application/json" } : {}),
   };
 
-  const res = await fetch(url, {
+  // Ensure URL uses correct base for deployment
+  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+
+  const res = await fetch(fullUrl, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
@@ -45,7 +54,10 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const endpoint = queryKey.join("/") as string;
+    const fullUrl = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    
+    const res = await fetch(fullUrl, {
       headers: getAuthHeaders(),
       credentials: "include",
     });
