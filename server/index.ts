@@ -51,11 +51,11 @@ function createServer() {
   return app;
 }
 
+const app = createServer();
+
 // For local development
 if (!process.env.VERCEL) {
   (async () => {
-    const app = createServer();
-    
     const serverPort = parseInt(process.env.PORT || "3001", 10);
     const server = app.listen(serverPort, "0.0.0.0", () => {
       log(`serving on port ${serverPort}`);
@@ -70,8 +70,10 @@ if (!process.env.VERCEL) {
       serveStatic(app);
     }
   })();
+} else {
+  // For Vercel production, serve static files
+  serveStatic(app);
 }
 
 // Export for Vercel
-export { createServer };
-export default createServer();
+export default app;
