@@ -48,8 +48,6 @@ export default function KegiatanRKAS() {
     tw2: 0,
     tw3: 0,
     tw4: 0,
-    total: null as number | null,
-    showManualTotal: false,
     tahun: 2025,
     status: "draft"
   });
@@ -151,7 +149,7 @@ export default function KegiatanRKAS() {
     try {
       setLoading(true);
       
-      // Prepare data for API - total is optional
+      // Prepare data for API - total akan dihitung otomatis di server
       const activityData = {
         kode_giat: formData.kode_giat,
         nama_giat: formData.nama_giat,
@@ -162,8 +160,6 @@ export default function KegiatanRKAS() {
         tw2: formData.tw2,
         tw3: formData.tw3,
         tw4: formData.tw4,
-        // Only include total if manually set
-        ...(formData.showManualTotal && formData.total !== null ? { total: formData.total } : {}),
         status: formData.status
       };
 
@@ -220,8 +216,6 @@ export default function KegiatanRKAS() {
       tw2: 0,
       tw3: 0,
       tw4: 0,
-      total: null,
-      showManualTotal: false,
       tahun: 2025,
       status: "draft"
     });
@@ -328,43 +322,34 @@ export default function KegiatanRKAS() {
                           placeholder="Masukkan deskripsi kegiatan"
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="bidangId">Bidang Kegiatan</Label>
-                          <Select
-                            value={formData.bidang_id}
-                            onValueChange={(value) => setFormData({...formData, bidang_id: value})}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih bidang" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {bidangOptions.map((bidang: any) => (
-                                <SelectItem key={bidang.id} value={bidang.id}>
-                                  {bidang.kode_bidang} - {bidang.nama_bidang}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label htmlFor="danaId">Sumber Dana</Label>
-                          <Select
-                            value={formData.dana_id}
-                            onValueChange={(value) => setFormData({...formData, dana_id: value})}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih sumber dana" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {danaOptions.map((dana: any) => (
-                                <SelectItem key={dana.id} value={dana.id}>
-                                  {dana.kode_dana} - {dana.nama_dana}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      <div>
+                        <Label htmlFor="standardId">Standar Kegiatan</Label>
+                        <Select
+                          value={formData.standar_id}
+                          onValueChange={(value) => setFormData({...formData, standar_id: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih standar" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="d36a22a2-5747-4bab-9c4c-eca7edba751b">Standar Pendidikan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="danaId">Sumber Dana</Label>
+                        <Select
+                          value={formData.dana_id}
+                          onValueChange={(value) => setFormData({...formData, dana_id: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih sumber dana" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="3.02.01">BOP Reguler</SelectItem>
+                            <SelectItem value="3.02.02">BOS Reguler</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </TabsContent>
                     
@@ -412,20 +397,9 @@ export default function KegiatanRKAS() {
                         </div>
                       </div>
                       <div className="space-y-3">
-                        {/* Auto-calculated total */}
+                        {/* Info total (tidak ada input manual) */}
                         <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm text-slate-600">Total Anggaran (Otomatis):</div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setFormData({...formData, showManualTotal: !formData.showManualTotal})}
-                              className="text-xs h-6"
-                            >
-                              {formData.showManualTotal ? 'Gunakan Otomatis' : 'Edit Manual'}
-                            </Button>
-                          </div>
+                          <div className="text-sm text-slate-600 mb-2">Total Anggaran:</div>
                           <div className="text-lg font-semibold text-slate-900">
                             {formatCurrency(formData.tw1 + formData.tw2 + formData.tw3 + formData.tw4)}
                           </div>
@@ -433,40 +407,6 @@ export default function KegiatanRKAS() {
                             Dihitung otomatis dari penjumlahan TW1-TW4
                           </div>
                         </div>
-
-                        {/* Manual total input (optional) */}
-                        {formData.showManualTotal && (
-                          <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                            <div className="flex items-center justify-between mb-2">
-                              <Label htmlFor="totalManual" className="text-sm font-medium text-amber-800">
-                                Total Anggaran Manual (Opsional)
-                              </Label>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setFormData({...formData, total: null, showManualTotal: false})}
-                                className="text-red-600 hover:text-red-800 text-xs h-6"
-                              >
-                                ✕ Hapus
-                              </Button>
-                            </div>
-                            <Input
-                              id="totalManual"
-                              type="number"
-                              value={formData.total || ""}
-                              onChange={(e) => setFormData({...formData, total: e.target.value ? parseInt(e.target.value) : null})}
-                              placeholder="Masukkan total anggaran manual"
-                              className="mb-2"
-                            />
-                            <div className="text-xs text-amber-700">
-                              {formData.total ? 
-                                `Manual: ${formatCurrency(formData.total)}` : 
-                                'Kosongkan untuk menggunakan perhitungan otomatis'
-                              }
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </TabsContent>
                   <div className="flex justify-end space-x-2 pt-4">
