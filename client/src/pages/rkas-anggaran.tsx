@@ -442,7 +442,10 @@ export default function RKASAnggaran() {
                                 </Button>
                                 <AnggaranForm
                                   mode="edit"
-                                  initialData={item}
+                                  initialData={{
+                                    ...item,
+                                    month: typeof item.month === 'number' ? item.month.toString() : item.month
+                                  }}
                                   onSubmit={(data) => handleUpdateBudgetItem(item.id, data)}
                                   selectedYear={selectedYear}
                                   selectedQuarter={selectedQuarter}

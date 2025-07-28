@@ -561,7 +561,7 @@ export default function KegiatanRKAS() {
                             </div>
                           </td>
                           <td className="py-3 px-4 text-slate-600">
-                            {bidang ? `${bidang.kode_bidang} - ${bidang.nama_bidang}` : '-'}
+                            {bidang ? `${bidang.kode || bidang.id} - ${bidang.nama || bidang.nama_bidang}` : '-'}
                           </td>
                           <td className="py-3 px-4 text-right font-bold text-slate-900">
                             {formatCurrency(total)}
