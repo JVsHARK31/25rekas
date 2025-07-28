@@ -23,9 +23,6 @@
       "dest": "/client/index.html"
     }
   ],
-  "env": {
-    "DATABASE_URL": "@database_url"
-  },
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public"
