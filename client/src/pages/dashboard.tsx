@@ -90,12 +90,12 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* System Demo Notice - Matching reference design */}
+          {/* System Status Notice */}
           <Alert className="border-green-200 bg-green-50 mb-6">
             <Info className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800">
-              <strong>Sistem Demo:</strong> Anda sedang menggunakan sistem demo RKAS dengan data simulasi SMPN 25 Jakarta.
-              Semua fitur dapat digunakan untuk keperluan evaluasi dan pelatihan.
+              <strong>Status Sistem:</strong> Sistem RKAS SMPN 25 Jakarta aktif dan siap digunakan.
+              Semua fitur telah terintegrasi dengan database untuk pengelolaan data yang optimal.
             </AlertDescription>
           </Alert>
 

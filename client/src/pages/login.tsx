@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 
 export default function Login() {
@@ -80,11 +80,9 @@ export default function Login() {
               <CardTitle className="text-2xl font-bold text-slate-900">
                 Masuk ke Sistem RKAS
               </CardTitle>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm font-medium text-blue-800">
-                  <strong>Sistem Demo:</strong> Aplikasi berjalan dalam mode demo dengan data simulasi SMPN 25 Jakarta.
-                </p>
-              </div>
+              <CardDescription className="text-slate-600">
+                Sistem Rencana Kegiatan dan Anggaran Sekolah DKI Jakarta
+              </CardDescription>
             </div>
           </CardHeader>
           

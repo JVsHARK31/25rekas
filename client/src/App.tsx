@@ -31,6 +31,18 @@ import SumberDana from "@/pages/master/sumber-dana";
 import Rekening from "@/pages/master/rekening";
 import Komponen from "@/pages/master/komponen";
 
+// Monitoring Pages
+import MonitoringProgress from "@/pages/monitoring/progress";
+import MonitoringRealisasi from "@/pages/monitoring/realisasi";
+
+// Laporan Pages
+import LaporanRKAS from "@/pages/laporan/rkas";
+import LaporanRealisasi from "@/pages/laporan/realisasi";
+
+// Admin Pages
+import AdminUsers from "@/pages/admin/users";
+import AdminSettings from "@/pages/admin/settings";
+
 function Router() {
   return (
     <Switch>
@@ -53,6 +65,18 @@ function Router() {
       <Route path="/master/sumber-dana" component={SumberDana} />
       <Route path="/master/rekening" component={Rekening} />
       <Route path="/master/komponen" component={Komponen} />
+      
+      {/* Monitoring Routes */}
+      <Route path="/monitoring/progress" component={MonitoringProgress} />
+      <Route path="/monitoring/realisasi" component={MonitoringRealisasi} />
+      
+      {/* Laporan Routes */}
+      <Route path="/laporan/rkas" component={LaporanRKAS} />
+      <Route path="/laporan/realisasi" component={LaporanRealisasi} />
+      
+      {/* Admin Routes */}
+      <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/settings" component={AdminSettings} />
       
       {/* Other Routes */}
       <Route path="/files" component={FileManagement} />
