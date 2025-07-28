@@ -17,27 +17,27 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// RKAS Activities table - matching existing database structure
+// RKAS Activities table - matching actual database structure
 export const rkasActivities = pgTable("rkas_activities", {
   id: varchar("id").primaryKey(),
-  standardId: varchar("standard_id"),
-  kodeGiat: text("kode_giat"),
-  namaGiat: text("nama_giat"),
+  standard_id: varchar("standard_id").notNull(),
+  kode_giat: text("kode_giat"),
+  nama_giat: text("nama_giat").notNull(),
   subtitle: text("subtitle"),
-  kodeDana: text("kode_dana"),
-  namaDana: text("nama_dana"),
-  tw1: decimal("tw1"),
-  tw2: decimal("tw2"),  
-  tw3: decimal("tw3"),
-  tw4: decimal("tw4"),
-  total: decimal("total"),
-  realisasi: decimal("realisasi"),
-  tanggal: date("tanggal"),
-  noPesanan: text("no_pesanan"),
+  kode_dana: text("kode_dana").notNull(),
+  nama_dana: text("nama_dana").notNull(),
+  tw1: decimal("tw1").notNull(),
+  tw2: decimal("tw2").notNull(),  
+  tw3: decimal("tw3").notNull(),
+  tw4: decimal("tw4").notNull(),
+  total: decimal("total").notNull(),
+  realisasi: decimal("realisasi").notNull(),
+  tanggal: timestamp("tanggal"),
+  no_pesanan: text("no_pesanan"),
   status: varchar("status").notNull().default("draft"),
-  createdBy: varchar("created_by"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_by: varchar("created_by").notNull(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 // RKAS Budget Items table
@@ -84,11 +84,39 @@ export type InsertRKASBudgetItem = typeof rkasBudgetItems.$inferInsert;
 export type UserPreference = typeof userPreferences.$inferSelect;
 export type InsertUserPreference = typeof userPreferences.$inferInsert;
 
-// Zod schemas
+// Zod schemas with proper transformations
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
-export const insertRKASActivitySchema = createInsertSchema(rkasActivities).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertRKASBudgetItemSchema = createInsertSchema(rkasBudgetItems).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertUserPreferenceSchema = createInsertSchema(userPreferences).omit({ id: true, createdAt: true, updatedAt: true });
+
+export const insertRKASActivitySchema = createInsertSchema(rkasActivities).omit({ 
+  id: true, 
+  created_at: true, 
+  updated_at: true 
+}).extend({
+  tw1: z.coerce.number().default(0),
+  tw2: z.coerce.number().default(0),
+  tw3: z.coerce.number().default(0),
+  tw4: z.coerce.number().default(0),
+  total: z.coerce.number().default(0),
+  realisasi: z.coerce.number().default(0),
+  created_by: z.string().default("admin-001")
+});
+
+export const insertRKASBudgetItemSchema = createInsertSchema(rkasBudgetItems).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+}).extend({
+  allocatedBudget: z.coerce.number().optional(),
+  usedBudget: z.coerce.number().optional(),
+  remainingBudget: z.coerce.number().default(0),
+  year: z.coerce.number()
+});
+
+export const insertUserPreferenceSchema = createInsertSchema(userPreferences).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
 
 export type InsertUserData = z.infer<typeof insertUserSchema>;
 export type InsertRKASActivityData = z.infer<typeof insertRKASActivitySchema>;

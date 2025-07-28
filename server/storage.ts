@@ -72,15 +72,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createActivity(activity: InsertRKASActivity): Promise<RKASActivity> {
-    const [newActivity] = await db
-      .insert(rkasActivities)
-      .values({
+    try {
+      const activityWithId = {
         ...activity,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .returning();
-    return newActivity;
+        id: `rkas-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      };
+      
+      const [newActivity] = await db
+        .insert(rkasActivities)
+        .values(activityWithId)
+        .returning();
+      return newActivity;
+    } catch (error) {
+      console.error('Database error in createActivity:', error);
+      throw new Error('Failed to create activity in database');
+    }
   }
 
   async updateActivity(id: string, activity: Partial<RKASActivity>): Promise<RKASActivity> {

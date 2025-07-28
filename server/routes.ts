@@ -97,21 +97,42 @@ router.get('/api/activities', async (req: Request, res: Response) => {
 
 router.post('/api/activities', async (req: Request, res: Response) => {
   try {
-    // Transform date string to proper format if needed
-    const requestData = {
-      ...req.body,
-      tanggal: req.body.tanggal || new Date().toISOString().split('T')[0]
+    console.log('Received activity data:', req.body);
+    
+    // Transform form data to match database schema
+    const transformedData = {
+      standard_id: req.body.standar_id || req.body.standard_id || 'd36a22a2-5747-4bab-9c4c-eca7edba751b',
+      kode_giat: req.body.kode_giat,
+      nama_giat: req.body.nama_giat,
+      subtitle: req.body.subtitle,
+      kode_dana: req.body.dana_id || req.body.kode_dana || '3.02.01',
+      nama_dana: req.body.nama_dana || 'BOP Reguler',
+      tw1: req.body.tw1,
+      tw2: req.body.tw2,
+      tw3: req.body.tw3,
+      tw4: req.body.tw4,
+      total: req.body.total || (Number(req.body.tw1) + Number(req.body.tw2) + Number(req.body.tw3) + Number(req.body.tw4)),
+      realisasi: 0,
+      status: req.body.status || 'draft',
+      created_by: 'd8e1be8f-f3cc-459f-929d-7f8a854c5f39'
     };
     
-    const validatedData = insertRKASActivitySchema.parse(requestData);
+    console.log('Transformed data:', transformedData);
+    
+    const validatedData = insertRKASActivitySchema.parse(transformedData);
+    console.log('Validated data:', validatedData);
+    
     const activity = await storage.createActivity(validatedData);
+    console.log('Created activity:', activity);
+    
     res.status(201).json(activity);
   } catch (error) {
     console.error('Error creating activity:', error);
     if (error instanceof z.ZodError) {
+      console.error('Validation errors:', error.errors);
       res.status(400).json({ error: 'Validation error', details: error.errors });
     } else {
-      res.status(500).json({ error: 'Failed to create activity' });
+      res.status(500).json({ error: 'Failed to create activity', details: error.message });
     }
   }
 });
