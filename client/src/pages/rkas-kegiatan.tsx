@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import PeriodSelector, { PeriodType, Quarter, Month } from "@/components/dashboard/period-selector";
 import KegiatanForm from "@/components/forms/kegiatan-form";
+import ColumnManager, { TableColumn, renderTableCell } from "@/components/rkas/column-manager";
 import { useKegiatanDB } from "@/hooks/use-kegiatan-db";
 import { usePreferences } from "@/hooks/use-preferences";
 import { toast } from "@/hooks/use-toast";
@@ -64,6 +65,22 @@ export default function RKASKegiatan() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [bidangFilter, setBidangFilter] = useState<string>("all");
+
+  // Column management state
+  const [columns, setColumns] = useState<TableColumn[]>([
+    { id: '1', key: 'namaGiat', label: 'Nama Kegiatan', visible: true, type: 'text', required: true, sortable: true },
+    { id: '2', key: 'kodeGiat', label: 'Kode Kegiatan', visible: true, type: 'text', required: false, sortable: true },
+    { id: '3', key: 'namaDana', label: 'Sumber Dana', visible: true, type: 'badge', required: true, sortable: true },
+    { id: '4', key: 'total', label: 'Total Anggaran', visible: true, type: 'currency', required: true, sortable: true },
+    { id: '5', key: 'tw1', label: 'TW1', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '6', key: 'tw2', label: 'TW2', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '7', key: 'tw3', label: 'TW3', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '8', key: 'tw4', label: 'TW4', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '9', key: 'realisasi', label: 'Realisasi', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '10', key: 'status', label: 'Status', visible: true, type: 'status', required: true, sortable: true },
+    { id: '11', key: 'tanggal', label: 'Tanggal', visible: true, type: 'date', required: false, sortable: true },
+    { id: '12', key: 'subtitle', label: 'Deskripsi', visible: false, type: 'text', required: false, sortable: false }
+  ]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -134,6 +151,16 @@ export default function RKASKegiatan() {
   const handleDeleteActivity = async (id: string) => {
     await deleteKegiatan(id);
   };
+
+  const handleAddColumn = (column: Omit<TableColumn, 'id'>) => {
+    const newColumn: TableColumn = {
+      ...column,
+      id: Date.now().toString()
+    };
+    setColumns(prev => [...prev, newColumn]);
+  };
+
+  const visibleColumns = columns.filter(col => col.visible);
 
   const getPeriodLabel = () => {
     if (selectedPeriodType === 'quarterly') {
@@ -274,6 +301,12 @@ export default function RKASKegiatan() {
                   </SelectContent>
                 </Select>
 
+                <ColumnManager 
+                  columns={columns}
+                  onColumnsChange={setColumns}
+                  onAddColumn={handleAddColumn}
+                />
+                
                 <Button variant="outline" className="flex items-center space-x-2">
                   <Download className="h-4 w-4" />
                   <span>Export</span>
@@ -323,98 +356,73 @@ export default function RKASKegiatan() {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Kegiatan
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Bidang
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Anggaran
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Periode
-                        </th>
+                        {visibleColumns.map((column) => (
+                          <th 
+                            key={column.id}
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            {column.label}
+                          </th>
+                        ))}
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Aksi
                         </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredActivities.map((activity: any) => {
-                        const activityPeriod = activity.tanggal 
-                          ? new Date(activity.tanggal).toLocaleDateString('id-ID', { 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })
-                          : 'Tanggal tidak tersedia';
-
-                        return (
-                          <tr key={activity.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">
-                                  {activity.namaGiat || activity.name || 'Nama kegiatan tidak tersedia'}
+                      {filteredActivities.map((activity: any) => (
+                        <tr key={activity.id} className="hover:bg-gray-50">
+                          {visibleColumns.map((column) => (
+                            <td key={column.id} className="px-6 py-4 whitespace-nowrap">
+                              {column.key === 'namaGiat' ? (
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {activity.namaGiat || activity.name || 'Nama kegiatan tidak tersedia'}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    {activity.subtitle || activity.description || 'Kode: ' + (activity.kodeGiat || '-')}
+                                  </div>
                                 </div>
-                                <div className="text-sm text-gray-500">
-                                  {activity.subtitle || activity.description || 'Kode: ' + (activity.kodeGiat || '-')}
+                              ) : (
+                                <div className="text-sm text-gray-900">
+                                  {renderTableCell(activity[column.key], column)}
                                 </div>
-                              </div>
+                              )}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge variant="secondary">{activity.namaDana || activity.bidang || 'Tidak tersedia'}</Badge>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {formatCurrency(Number(activity.total) || Number(activity.budget) || 0)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge className={getStatusColor(activity.status)}>
-                                {getStatusLabel(activity.status)}
-                              </Badge>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center space-x-1">
-                                <Clock className="h-3 w-3" />
-                                <span>{activityPeriod}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <div className="flex items-center space-x-2">
-                                <Button variant="ghost" size="sm" title="Lihat Detail">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <KegiatanForm
-                                  mode="edit"
-                                  initialData={activity}
-                                  onSubmit={(data) => handleUpdateActivity(activity.id, data)}
-                                  selectedYear={selectedYear}
-                                  selectedQuarter={selectedQuarter}
-                                  selectedMonth={selectedMonth}
-                                  periodType={selectedPeriodType}
-                                  trigger={
-                                    <Button variant="ghost" size="sm" title="Edit Kegiatan">
-                                      <Edit className="h-4 w-4" />
-                                    </Button>
-                                  }
-                                />
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" title="Hapus Kegiatan">
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
+                          ))}
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex items-center space-x-2">
+                              <Button variant="ghost" size="sm" title="Lihat Detail">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <KegiatanForm
+                                mode="edit"
+                                initialData={activity}
+                                onSubmit={(data) => handleUpdateActivity(activity.id, data)}
+                                selectedYear={selectedYear}
+                                selectedQuarter={selectedQuarter}
+                                selectedMonth={selectedMonth}
+                                periodType={selectedPeriodType}
+                                trigger={
+                                  <Button variant="ghost" size="sm" title="Edit Kegiatan">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                }
+                              />
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" title="Hapus Kegiatan">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
                                       <AlertDialogTitle className="flex items-center space-x-2">
                                         <AlertTriangle className="h-5 w-5 text-red-600" />
                                         <span>Konfirmasi Hapus</span>
                                       </AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Apakah Anda yakin ingin menghapus kegiatan "{activity.name}"? 
+                                        Apakah Anda yakin ingin menghapus kegiatan "{activity.namaGiat || activity.name || 'ini'}"? 
                                         Tindakan ini tidak dapat dibatalkan.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
@@ -431,9 +439,8 @@ export default function RKASKegiatan() {
                                 </AlertDialog>
                               </div>
                             </td>
-                          </tr>
-                        );
-                      })}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
