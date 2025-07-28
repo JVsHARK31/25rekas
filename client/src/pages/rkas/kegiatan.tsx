@@ -93,22 +93,16 @@ export default function KegiatanRKAS() {
       setStandarOptions(mockAPI.getStandar());
       setDanaOptions(mockAPI.getDana());
       
-      // Calculate stats
-      const totalBudget = activities.reduce((sum: number, item: any) => {
-        const tw1 = parseFloat(item.tw1) || 0;
-        const tw2 = parseFloat(item.tw2) || 0;
-        const tw3 = parseFloat(item.tw3) || 0;
-        const tw4 = parseFloat(item.tw4) || 0;
-        return sum + tw1 + tw2 + tw3 + tw4;
-      }, 0);
+      // Calculate stats - no longer using totalBudget
+      const activitiesCount = activities.length;
       
       setStats({
-        total: activities.length,
+        total: activitiesCount,
         draft: activities.filter((item: any) => item.status === "draft").length,
         submitted: activities.filter((item: any) => item.status === "submitted").length,
         approved: activities.filter((item: any) => item.status === "approved").length,
         rejected: activities.filter((item: any) => item.status === "rejected").length,
-        totalBudget
+        totalBudget: 0 // no longer used
       });
       
     } catch (error) {
@@ -396,18 +390,6 @@ export default function KegiatanRKAS() {
                           />
                         </div>
                       </div>
-                      <div className="space-y-3">
-                        {/* Info total (tidak ada input manual) */}
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                          <div className="text-sm text-slate-600 mb-2">Total Anggaran:</div>
-                          <div className="text-lg font-semibold text-slate-900">
-                            {formatCurrency(formData.tw1 + formData.tw2 + formData.tw3 + formData.tw4)}
-                          </div>
-                          <div className="text-xs text-slate-500 mt-1">
-                            Dihitung otomatis dari penjumlahan TW1-TW4
-                          </div>
-                        </div>
-                      </div>
                     </TabsContent>
                   <div className="flex justify-end space-x-2 pt-4">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -469,10 +451,12 @@ export default function KegiatanRKAS() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-slate-600">Total Anggaran</p>
-                    <p className="text-lg font-bold text-slate-900">{formatCurrency(stats.totalBudget)}</p>
+                    <p className="text-sm text-slate-600">Rejected</p>
+                    <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
                   </div>
-                  <span className="text-2xl">💰</span>
+                  <Badge className="bg-red-100 text-red-800">
+                    ✗
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
@@ -526,19 +510,16 @@ export default function KegiatanRKAS() {
                     <tr className="border-b border-slate-200">
                       <th className="text-left py-3 px-4 font-medium text-slate-600">Kode Kegiatan</th>
                       <th className="text-left py-3 px-4 font-medium text-slate-600">Nama Kegiatan</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-600">Bidang</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-600">Anggaran</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-600">Status</th>
-                      <th className="text-left py-3 px-4 font-medium text-slate-600">Aksi</th>
+                      <th className="text-right py-3 px-4 font-medium text-slate-600">TW1</th>
+                      <th className="text-right py-3 px-4 font-medium text-slate-600">TW2</th>
+                      <th className="text-right py-3 px-4 font-medium text-slate-600">TW3</th>
+                      <th className="text-right py-3 px-4 font-medium text-slate-600">TW4</th>
+                      <th className="text-center py-3 px-4 font-medium text-slate-600">Status</th>
+                      <th className="text-center py-3 px-4 font-medium text-slate-600">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredData.map((item: any) => {
-                      const total = (parseFloat(item.tw1) || 0) + (parseFloat(item.tw2) || 0) + 
-                                   (parseFloat(item.tw3) || 0) + (parseFloat(item.tw4) || 0);
-                      const bidang = bidangOptions.find((b: any) => b.id === item.bidang_id);
-                      const dana = danaOptions.find((d: any) => d.id === item.dana_id);
-                      
                       return (
                         <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
                           <td className="py-3 px-4 font-mono font-medium text-slate-900">{item.kode_giat}</td>
@@ -550,17 +531,23 @@ export default function KegiatanRKAS() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-4 text-slate-600">
-                            {bidang ? `${bidang.kode || bidang.id} - ${bidang.nama || bidang.nama_bidang}` : '-'}
+                          <td className="py-3 px-4 text-right font-bold text-green-600">
+                            {formatCurrency(parseFloat(item.tw1) || 0)}
                           </td>
-                          <td className="py-3 px-4 text-right font-bold text-slate-900">
-                            {formatCurrency(total)}
+                          <td className="py-3 px-4 text-right font-bold text-blue-600">
+                            {formatCurrency(parseFloat(item.tw2) || 0)}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 text-right font-bold text-orange-600">
+                            {formatCurrency(parseFloat(item.tw3) || 0)}
+                          </td>
+                          <td className="py-3 px-4 text-right font-bold text-purple-600">
+                            {formatCurrency(parseFloat(item.tw4) || 0)}
+                          </td>
+                          <td className="py-3 px-4 text-center">
                             {getStatusBadge(item.status)}
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="flex space-x-2">
+                          <td className="py-3 px-4 text-center">
+                            <div className="flex space-x-2 justify-center">
                               <Button variant="outline" size="sm" title="Edit kegiatan">
                                 <Edit size={14} />
                               </Button>
