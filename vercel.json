@@ -1,12 +1,11 @@
 {
   "version": 2,
-  "name": "erkas-pro",
   "builds": [
     {
-      "src": "package.json",
+      "src": "client/index.html",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist/public"
+        "distDir": "dist"
       }
     },
     {
@@ -20,19 +19,14 @@
       "dest": "/server/index.ts"
     },
     {
-      "handle": "filesystem"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/client/index.html"
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "DATABASE_URL": "@database_url"
   },
-  "functions": {
-    "server/index.ts": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "client/dist"
 }

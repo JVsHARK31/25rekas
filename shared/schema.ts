@@ -61,7 +61,7 @@ export const rkasBudgetItems = pgTable("rkas_budget_items", {
 // User Preferences table for saving period filters
 export const userPreferences = pgTable("user_preferences", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
+  userId: varchar("user_id"),
   periodType: varchar("period_type", { length: 20 }).notNull().default("quarterly"),
   selectedQuarter: varchar("selected_quarter", { length: 10 }),
   selectedMonth: integer("selected_month"),

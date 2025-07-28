@@ -71,15 +71,14 @@ export default function RKASKegiatan() {
     { id: '1', key: 'namaGiat', label: 'Nama Kegiatan', visible: true, type: 'text', required: true, sortable: true },
     { id: '2', key: 'kodeGiat', label: 'Kode Kegiatan', visible: true, type: 'text', required: false, sortable: true },
     { id: '3', key: 'namaDana', label: 'Sumber Dana', visible: true, type: 'badge', required: true, sortable: true },
-    { id: '4', key: 'total', label: 'Total Anggaran', visible: true, type: 'currency', required: true, sortable: true },
-    { id: '5', key: 'tw1', label: 'TW1', visible: false, type: 'currency', required: false, sortable: true },
-    { id: '6', key: 'tw2', label: 'TW2', visible: false, type: 'currency', required: false, sortable: true },
-    { id: '7', key: 'tw3', label: 'TW3', visible: false, type: 'currency', required: false, sortable: true },
-    { id: '8', key: 'tw4', label: 'TW4', visible: false, type: 'currency', required: false, sortable: true },
-    { id: '9', key: 'realisasi', label: 'Realisasi', visible: false, type: 'currency', required: false, sortable: true },
-    { id: '10', key: 'status', label: 'Status', visible: true, type: 'status', required: true, sortable: true },
-    { id: '11', key: 'tanggal', label: 'Tanggal', visible: true, type: 'date', required: false, sortable: true },
-    { id: '12', key: 'subtitle', label: 'Deskripsi', visible: false, type: 'text', required: false, sortable: false }
+    { id: '4', key: 'tw1', label: 'TW1', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '5', key: 'tw2', label: 'TW2', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '6', key: 'tw3', label: 'TW3', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '7', key: 'tw4', label: 'TW4', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '8', key: 'realisasi', label: 'Realisasi', visible: false, type: 'currency', required: false, sortable: true },
+    { id: '9', key: 'status', label: 'Status', visible: true, type: 'status', required: true, sortable: true },
+    { id: '10', key: 'tanggal', label: 'Tanggal', visible: true, type: 'date', required: false, sortable: true },
+    { id: '11', key: 'subtitle', label: 'Deskripsi', visible: false, type: 'text', required: false, sortable: false }
   ]);
 
   const formatCurrency = (amount: number) => {

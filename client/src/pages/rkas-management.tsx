@@ -34,10 +34,38 @@ export default function RkasManagement() {
     }
   }, [isAuthenticated, authLoading, setLocation]);
 
-  const { data: activities, isLoading } = useQuery<RkasActivity[]>({
-    queryKey: ['/api/rkas/activities'],
-    enabled: isAuthenticated,
+  // Transform data from snake_case to camelCase
+  const transformActivity = (activity: any): RkasActivity => ({
+    id: activity.id,
+    standardId: activity.standard_id,
+    kodeGiat: activity.kode_giat,
+    namaGiat: activity.nama_giat,
+    subtitle: activity.subtitle,
+    kodeDana: activity.kode_dana,
+    namaDana: activity.nama_dana,
+    tw1: activity.tw1?.toString() || '0',
+    tw2: activity.tw2?.toString() || '0',
+    tw3: activity.tw3?.toString() || '0',
+    tw4: activity.tw4?.toString() || '0',
+    total: activity.total?.toString() || '0',
+    realisasi: activity.realisasi?.toString() || '0',
+    tanggal: activity.tanggal,
+    noPesanan: activity.no_pesanan,
+    status: activity.status || 'draft',
+    createdBy: activity.created_by,
+    createdAt: activity.created_at,
+    updatedAt: activity.updated_at,
   });
+
+  const { data: rawActivities, isLoading, error } = useQuery<any[]>({
+    queryKey: ['/api/activities'],
+    enabled: isAuthenticated,
+    retry: 3,
+    retryDelay: 1000,
+  });
+
+  // Transform the data
+  const activities = rawActivities?.map(transformActivity) || [];
 
   if (authLoading || !isAuthenticated) {
     return (
@@ -161,9 +189,24 @@ export default function RkasManagement() {
               {isLoading ? (
                 <div className="flex items-center justify-center p-12">
                   <div className="erkas-loading h-8 w-8" />
+                  <span className="ml-3 text-erkas-secondary">Memuat data kegiatan...</span>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center p-12">
+                  <div className="text-red-500 mb-2">⚠️ Terjadi kesalahan saat memuat data</div>
+                  <div className="text-sm text-erkas-secondary mb-4">
+                    {error instanceof Error ? error.message : 'Gagal memuat data kegiatan'}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => window.location.reload()}
+                    className="text-sm"
+                  >
+                    Coba Lagi
+                  </Button>
                 </div>
               ) : (
-                <RkasTable activities={activities || []} filters={filters} />
+                <RkasTable activities={activities} filters={filters} />
               )}
             </CardContent>
           </Card>

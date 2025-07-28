@@ -3,7 +3,7 @@ export const API_CONFIG = {
   baseURL: import.meta.env.VITE_API_BASE_URL || 
            (import.meta.env.MODE === 'production' 
              ? 'https://erkas-pro-api.vercel.app' 
-             : 'http://localhost:5000'),
+             : 'http://localhost:3001'),
   
   // API endpoints
   endpoints: {

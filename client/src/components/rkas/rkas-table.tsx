@@ -70,16 +70,28 @@ export default function RkasTable({ activities, filters }: RkasTableProps) {
     },
   });
 
-  // Filter activities based on search and filters
+  // Filter activities based on filters
   const filteredActivities = activities.filter(activity => {
-    const matchesSearch = !filters.search || 
-      activity.namaGiat.toLowerCase().includes(filters.search.toLowerCase()) ||
-      activity.kodeGiat.toLowerCase().includes(filters.search.toLowerCase());
+    const matchesBidang = filters.bidang === 'all' || activity.kodeGiat?.startsWith(filters.bidang);
+    const matchesDana = filters.dana === 'all' || activity.kodeDana?.includes(filters.dana);
+    const matchesStatus = filters.status === 'all' || activity.status === filters.status;
+    const matchesSearch = filters.search === '' || 
+      activity.namaGiat?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      activity.kodeGiat?.toLowerCase().includes(filters.search.toLowerCase());
     
-    const matchesStatus = !filters.status || activity.status === filters.status;
-    
-    return matchesSearch && matchesStatus;
+    return matchesBidang && matchesDana && matchesStatus && matchesSearch;
   });
+
+  if (!activities || activities.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12">
+        <div className="text-erkas-secondary mb-2">📋 Belum ada data kegiatan</div>
+        <div className="text-sm text-erkas-secondary">
+          Tambahkan kegiatan baru untuk mulai mengelola RKAS
+        </div>
+      </div>
+    );
+  }
 
   const handleCellEdit = (activityId: string, field: string, value: string) => {
     updateActivityMutation.mutate({

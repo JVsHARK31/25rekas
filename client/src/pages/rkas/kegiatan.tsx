@@ -12,12 +12,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Search, Filter, Edit, Trash2, FileText, Eye, RefreshCw } from "lucide-react";
+import { Plus, Search, Filter, Edit, Trash2, FileText, Eye, RefreshCw, Calendar, Save } from "lucide-react";
 import { mockAPI, initializeMockData } from "@/lib/mock-data";
+import { usePreferences } from "@/hooks/use-preferences";
+import PeriodSelector from "@/components/dashboard/period-selector";
 
 export default function KegiatanRKAS() {
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { preferences, savePreferences } = usePreferences();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -28,13 +31,19 @@ export default function KegiatanRKAS() {
   const [danaOptions, setDanaOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  
+  // Period filter states
+  const [selectedPeriodType, setSelectedPeriodType] = useState(preferences.periodType);
+  const [selectedQuarter, setSelectedQuarter] = useState(preferences.selectedQuarter);
+  const [selectedMonth, setSelectedMonth] = useState(preferences.selectedMonth);
+  const [selectedYear, setSelectedYear] = useState(preferences.selectedYear);
+  
   const [stats, setStats] = useState({
     total: 0,
     draft: 0,
     submitted: 0,
     approved: 0,
-    rejected: 0,
-    totalBudget: 0
+    rejected: 0
   });
 
   const [formData, setFormData] = useState({
@@ -101,8 +110,7 @@ export default function KegiatanRKAS() {
         draft: activities.filter((item: any) => item.status === "draft").length,
         submitted: activities.filter((item: any) => item.status === "submitted").length,
         approved: activities.filter((item: any) => item.status === "approved").length,
-        rejected: activities.filter((item: any) => item.status === "rejected").length,
-        totalBudget: 0 // no longer used
+        rejected: activities.filter((item: any) => item.status === "rejected").length
       });
       
     } catch (error) {
@@ -215,6 +223,18 @@ export default function KegiatanRKAS() {
     });
   };
 
+  const getPeriodLabel = () => {
+    if (selectedPeriodType === 'quarterly') {
+      return selectedQuarter;
+    } else {
+      const monthNames = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      return monthNames[selectedMonth - 1];
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       draft: { label: "Draft", className: "bg-gray-100 text-gray-800" },
@@ -266,7 +286,9 @@ export default function KegiatanRKAS() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Kegiatan RKAS</h2>
-              <p className="text-slate-600">Kelola kegiatan dan program sekolah</p>
+              <p className="text-slate-600">
+                Kelola kegiatan RKAS berdasarkan periode {getPeriodLabel()} {selectedYear}
+              </p>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
@@ -404,6 +426,45 @@ export default function KegiatanRKAS() {
               </DialogContent>
             </Dialog>
           </div>
+
+          {/* Period Filter with Save Button */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-5 w-5" />
+                  <span>Filter Periode</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => savePreferences({
+                    periodType: selectedPeriodType,
+                    selectedQuarter,
+                    selectedMonth,
+                    selectedYear,
+                    lastUsedPage: 'rkas-kegiatan'
+                  })}
+                  className="flex items-center space-x-2"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Simpan Filter</span>
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PeriodSelector
+                selectedPeriodType={selectedPeriodType}
+                selectedQuarter={selectedQuarter}
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+                onPeriodTypeChange={setSelectedPeriodType}
+                onQuarterChange={setSelectedQuarter}
+                onMonthChange={setSelectedMonth}
+                onYearChange={setSelectedYear}
+              />
+            </CardContent>
+          </Card>
 
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
