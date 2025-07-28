@@ -48,6 +48,8 @@ export default function KegiatanRKAS() {
     tw2: 0,
     tw3: 0,
     tw4: 0,
+    total: null as number | null,
+    showManualTotal: false,
     tahun: 2025,
     status: "draft"
   });
@@ -131,10 +133,18 @@ export default function KegiatanRKAS() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await mockAPI.addActivity(formData);
+      // Calculate final total - use manual if provided, otherwise auto-calculate
+      const finalTotal = formData.total !== null ? formData.total : (formData.tw1 + formData.tw2 + formData.tw3 + formData.tw4);
+      
+      const activityData = {
+        ...formData,
+        total: finalTotal
+      };
+      
+      await mockAPI.addActivity(activityData);
       toast({
         title: "Berhasil",
-        description: "Kegiatan RKAS berhasil ditambahkan",
+        description: `Kegiatan RKAS berhasil ditambahkan dengan total anggaran ${formatCurrency(finalTotal)}`,
       });
       setIsDialogOpen(false);
       resetForm();
@@ -160,6 +170,8 @@ export default function KegiatanRKAS() {
       tw2: 0,
       tw3: 0,
       tw4: 0,
+      total: null,
+      showManualTotal: false,
       tahun: 2025,
       status: "draft"
     });
@@ -349,11 +361,62 @@ export default function KegiatanRKAS() {
                           />
                         </div>
                       </div>
-                      <div className="bg-slate-50 p-4 rounded-lg">
-                        <div className="text-sm text-slate-600 mb-2">Total Anggaran:</div>
-                        <div className="text-lg font-semibold text-slate-900">
-                          {formatCurrency(formData.tw1 + formData.tw2 + formData.tw3 + formData.tw4)}
+                      <div className="space-y-3">
+                        {/* Auto-calculated total */}
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-sm text-slate-600">Total Anggaran (Otomatis):</div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setFormData({...formData, showManualTotal: !formData.showManualTotal})}
+                              className="text-xs h-6"
+                            >
+                              {formData.showManualTotal ? 'Gunakan Otomatis' : 'Edit Manual'}
+                            </Button>
+                          </div>
+                          <div className="text-lg font-semibold text-slate-900">
+                            {formatCurrency(formData.tw1 + formData.tw2 + formData.tw3 + formData.tw4)}
+                          </div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            Dihitung otomatis dari penjumlahan TW1-TW4
+                          </div>
                         </div>
+
+                        {/* Manual total input (optional) */}
+                        {formData.showManualTotal && (
+                          <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <Label htmlFor="totalManual" className="text-sm font-medium text-amber-800">
+                                Total Anggaran Manual (Opsional)
+                              </Label>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setFormData({...formData, total: null, showManualTotal: false})}
+                                className="text-red-600 hover:text-red-800 text-xs h-6"
+                              >
+                                ✕ Hapus
+                              </Button>
+                            </div>
+                            <Input
+                              id="totalManual"
+                              type="number"
+                              value={formData.total || ""}
+                              onChange={(e) => setFormData({...formData, total: e.target.value ? parseInt(e.target.value) : null})}
+                              placeholder="Masukkan total anggaran manual"
+                              className="mb-2"
+                            />
+                            <div className="text-xs text-amber-700">
+                              {formData.total ? 
+                                `Manual: ${formatCurrency(formData.total)}` : 
+                                'Kosongkan untuk menggunakan perhitungan otomatis'
+                              }
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </TabsContent>
                   <div className="flex justify-end space-x-2 pt-4">
