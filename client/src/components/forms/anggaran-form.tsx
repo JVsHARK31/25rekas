@@ -16,13 +16,18 @@ const anggaranSchema = z.object({
   activity: z.string().min(5, "Nama aktivitas minimal 5 karakter"),
   bidang: z.string().min(1, "Pilih bidang kegiatan"),
   standard: z.string().min(1, "Pilih standar nasional"),
-  allocatedBudget: z.number().min(1000000, "Anggaran minimal Rp 1.000.000"),
-  usedBudget: z.number().min(0, "Anggaran terpakai tidak boleh negatif"),
+  allocatedBudget: z.number().min(0, "Anggaran tidak boleh negatif").optional(),
+  usedBudget: z.number().min(0, "Anggaran terpakai tidak boleh negatif").optional(),
   responsible: z.string().min(3, "Nama penanggung jawab minimal 3 karakter"),
   quarter: z.string().optional(),
   month: z.string().optional(),
   year: z.number().min(2022).max(2030),
-}).refine((data) => data.usedBudget <= data.allocatedBudget, {
+}).refine((data) => {
+  if (data.allocatedBudget && data.usedBudget) {
+    return data.usedBudget <= data.allocatedBudget;
+  }
+  return true;
+}, {
   message: "Anggaran terpakai tidak boleh melebihi alokasi",
   path: ["usedBudget"],
 });
@@ -100,8 +105,8 @@ export default function AnggaranForm({
     }
   };
 
-  const allocatedBudget = form.watch("allocatedBudget");
-  const usedBudget = form.watch("usedBudget");
+  const allocatedBudget = form.watch("allocatedBudget") || 0;
+  const usedBudget = form.watch("usedBudget") || 0;
   const remainingBudget = allocatedBudget - usedBudget;
   const utilizationPercentage = allocatedBudget > 0 ? (usedBudget / allocatedBudget) * 100 : 0;
 
@@ -196,13 +201,29 @@ export default function AnggaranForm({
                 name="allocatedBudget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Alokasi Anggaran (Rp) *</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Total Anggaran (Rp)</FormLabel>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-slate-500">(Opsional)</span>
+                        {field.value && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => field.onChange(0)}
+                            className="text-red-600 hover:text-red-800 text-xs h-6 px-2"
+                          >
+                            ✕ Hapus
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                     <FormControl>
                       <Input 
                         type="number" 
-                        placeholder="50000000" 
+                        placeholder="Masukkan total anggaran (opsional)" 
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -215,13 +236,29 @@ export default function AnggaranForm({
                 name="usedBudget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Anggaran Terpakai (Rp) *</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Anggaran Terpakai (Rp)</FormLabel>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-slate-500">(Opsional)</span>
+                        {field.value && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => field.onChange(0)}
+                            className="text-red-600 hover:text-red-800 text-xs h-6 px-2"
+                          >
+                            ✕ Hapus
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                     <FormControl>
                       <Input 
                         type="number" 
-                        placeholder="0" 
+                        placeholder="Masukkan anggaran terpakai (opsional)" 
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : 0)}
                       />
                     </FormControl>
                     <FormMessage />
