@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 (async () => {
   app.use(routes);
   
-  const serverPort = process.env.PORT || 5000;
+  const serverPort = parseInt(process.env.PORT || "5000", 10);
   const server = app.listen(serverPort, "0.0.0.0", () => {
     log(`serving on port ${serverPort}`);
   });
@@ -57,7 +57,8 @@ app.use((req, res, next) => {
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
-  } else {
+  } else if (!process.env.VERCEL) {
+    // Only serve static files if not on Vercel (Vercel handles frontend separately)
     serveStatic(app);
   }
 
