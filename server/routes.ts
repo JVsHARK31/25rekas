@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
-import { storage } from './storage';
-import { insertRKASActivitySchema, insertRKASBudgetItemSchema, insertUserPreferenceSchema } from '@shared/schema';
+import { storage } from './storage.js';
+import { insertRKASActivitySchema, insertRKASBudgetItemSchema, insertUserPreferenceSchema } from '../shared/schema.js';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';

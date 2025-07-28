@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
-import routes from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import routes from "./routes.js";
+import { setupVite, serveStatic, log } from "./vite.js";
 
 const app = express();
 app.use(express.json());
@@ -64,3 +64,6 @@ app.use((req, res, next) => {
 
 
 })();
+
+// Export for Vercel
+export default app;

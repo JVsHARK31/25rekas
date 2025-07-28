@@ -11,8 +11,8 @@ import {
   type InsertRKASBudgetItem,
   type UserPreference,
   type InsertUserPreference
-} from "@shared/schema";
-import { db } from "./db";
+} from "../shared/schema.js";
+import { db } from "./db.js";
 import { eq, and } from "drizzle-orm";
 
 export interface IStorage {

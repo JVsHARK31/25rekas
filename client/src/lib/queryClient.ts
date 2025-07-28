@@ -21,7 +21,7 @@ function getAuthHeaders(): HeadersInit {
 // API Configuration for deployment
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
                     (import.meta.env.MODE === 'production' 
-                      ? 'https://erkas-pro-api.vercel.app' 
+                      ? window.location.origin 
                       : 'http://localhost:5000');
 
 export async function apiRequest(

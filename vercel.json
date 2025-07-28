@@ -1,20 +1,17 @@
 {
   "version": 2,
-  "name": "erkas-pro-fullstack",
+  "name": "erkas-pro",
   "builds": [
     {
-      "src": "client/package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "../dist/public"
+        "distDir": "dist/public"
       }
     },
     {
       "src": "server/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["server/**", "shared/**", "drizzle.config.ts"]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -33,6 +30,9 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "installCommand": "npm install",
-  "buildCommand": "npm run build"
+  "functions": {
+    "server/index.ts": {
+      "runtime": "nodejs18.x"
+    }
+  }
 }
