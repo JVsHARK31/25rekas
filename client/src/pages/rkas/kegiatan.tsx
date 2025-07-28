@@ -80,12 +80,17 @@ export default function KegiatanRKAS() {
     try {
       setLoading(true);
       
-      // Load activities
-      const activities = mockAPI.getActivities();
+      // Load activities from API
+      const response = await fetch('/api/activities');
+      if (!response.ok) {
+        throw new Error('Failed to fetch activities');
+      }
+      const activities = await response.json();
+      
       setActivitiesData(activities);
       setFilteredData(activities);
       
-      // Load options for dropdowns
+      // Load options for dropdowns (using mock data for now)
       setBidangOptions(mockAPI.getBidang());
       setStandarOptions(mockAPI.getStandar());
       setDanaOptions(mockAPI.getDana());
@@ -132,29 +137,74 @@ export default function KegiatanRKAS() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      // Calculate final total - use manual if provided, otherwise auto-calculate
-      const finalTotal = formData.total !== null ? formData.total : (formData.tw1 + formData.tw2 + formData.tw3 + formData.tw4);
-      
-      const activityData = {
-        ...formData,
-        total: finalTotal
-      };
-      
-      await mockAPI.addActivity(activityData);
-      toast({
-        title: "Berhasil",
-        description: `Kegiatan RKAS berhasil ditambahkan dengan total anggaran ${formatCurrency(finalTotal)}`,
-      });
-      setIsDialogOpen(false);
-      resetForm();
-      loadAllData();
-    } catch (error) {
+    
+    // Validate required fields
+    if (!formData.kode_giat || !formData.nama_giat || !formData.standar_id || !formData.dana_id) {
       toast({
         title: "Error",
-        description: "Gagal menambahkan kegiatan RKAS",
+        description: "Mohon lengkapi semua field yang wajib diisi",
         variant: "destructive",
       });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Prepare data for API - total is optional
+      const activityData = {
+        kode_giat: formData.kode_giat,
+        nama_giat: formData.nama_giat,
+        subtitle: formData.subtitle,
+        standar_id: formData.standar_id,
+        dana_id: formData.dana_id,
+        tw1: formData.tw1,
+        tw2: formData.tw2,
+        tw3: formData.tw3,
+        tw4: formData.tw4,
+        // Only include total if manually set
+        ...(formData.showManualTotal && formData.total !== null ? { total: formData.total } : {}),
+        status: formData.status
+      };
+
+      // Send to API
+      const response = await fetch('/api/activities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(activityData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create activity');
+      }
+
+      const newActivity = await response.json();
+      console.log('Created activity:', newActivity);
+      
+      // Reload data
+      await loadAllData();
+      
+      // Reset form
+      resetForm();
+      setIsDialogOpen(false);
+      
+      toast({
+        title: "Sukses",
+        description: `Kegiatan RKAS berhasil disimpan ke database`,
+      });
+      
+    } catch (error) {
+      console.error("Error creating activity:", error);
+      toast({
+        title: "Error",
+        description: `Gagal menambahkan kegiatan: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
