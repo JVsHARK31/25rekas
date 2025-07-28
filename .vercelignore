@@ -6,7 +6,5 @@ node_modules
 .DS_Store
 .replit
 uploads/
-dist/
-client/
 extracted_files/
 attached_assets/
