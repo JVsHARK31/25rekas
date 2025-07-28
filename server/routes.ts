@@ -97,7 +97,13 @@ router.get('/api/activities', async (req: Request, res: Response) => {
 
 router.post('/api/activities', async (req: Request, res: Response) => {
   try {
-    const validatedData = insertRKASActivitySchema.parse(req.body);
+    // Transform date string to proper format if needed
+    const requestData = {
+      ...req.body,
+      tanggal: req.body.tanggal || new Date().toISOString().split('T')[0]
+    };
+    
+    const validatedData = insertRKASActivitySchema.parse(requestData);
     const activity = await storage.createActivity(validatedData);
     res.status(201).json(activity);
   } catch (error) {

@@ -141,7 +141,21 @@ export default function RKASKegiatan() {
 
   // Handle CRUD operations
   const handleCreateActivity = async (data: any) => {
-    await createKegiatan(data);
+    console.log('Form data being submitted:', data);
+    try {
+      await createKegiatan(data);
+      toast({
+        title: "Berhasil!",
+        description: `Kegiatan "${data.name}" berhasil ditambahkan ke database.`,
+      });
+    } catch (error) {
+      console.error('Error creating activity:', error);
+      toast({
+        title: "Gagal!",
+        description: "Terjadi kesalahan saat menyimpan kegiatan.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUpdateActivity = async (id: string, data: any) => {

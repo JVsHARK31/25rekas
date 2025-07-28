@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, integer, decimal, timestamp, boolean, serial, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, decimal, timestamp, boolean, serial, uuid, date } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -32,7 +32,7 @@ export const rkasActivities = pgTable("rkas_activities", {
   tw4: decimal("tw4"),
   total: decimal("total"),
   realisasi: decimal("realisasi"),
-  tanggal: timestamp("tanggal"),
+  tanggal: date("tanggal"),
   noPesanan: text("no_pesanan"),
   status: varchar("status").notNull().default("draft"),
   createdBy: varchar("created_by"),

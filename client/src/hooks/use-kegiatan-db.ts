@@ -50,19 +50,26 @@ export function useKegiatanDB() {
   const createMutation = useMutation({
     mutationFn: (data: any) => {
       // Transform frontend data to database format
+      const budget = Number(data.budget) || 0;
+      const tw1Amount = data.tw1 ? Number(data.tw1) : budget * 0.25;
+      const tw2Amount = data.tw2 ? Number(data.tw2) : budget * 0.25;
+      const tw3Amount = data.tw3 ? Number(data.tw3) : budget * 0.25;
+      const tw4Amount = data.tw4 ? Number(data.tw4) : budget * 0.25;
+      
       const dbData = {
-        kodeGiat: data.code || `01.3.02.01.2.${Date.now().toString().slice(-3)}`,
-        namaGiat: data.name || data.namaGiat,
-        subtitle: data.description || data.subtitle,
+        kodeGiat: data.code || data.kodeGiat || `01.3.02.01.2.${String(Date.now()).slice(-3)}`,
+        namaGiat: data.name || data.namaGiat || 'Kegiatan Baru',
+        subtitle: data.description || data.subtitle || 'Deskripsi kegiatan',
         kodeDana: data.fundCode || data.kodeDana || '3.02.01',
         namaDana: data.fundName || data.namaDana || data.bidang || 'BOP Reguler',
-        tw1: data.tw1 || data.budget ? (Number(data.budget) * 0.25).toString() : '0',
-        tw2: data.tw2 || data.budget ? (Number(data.budget) * 0.25).toString() : '0',
-        tw3: data.tw3 || data.budget ? (Number(data.budget) * 0.25).toString() : '0',
-        tw4: data.tw4 || data.budget ? (Number(data.budget) * 0.25).toString() : '0',
-        total: data.total || data.budget?.toString() || '0',
-        realisasi: data.realisasi || '0',
-        tanggal: data.tanggal || new Date().toISOString(),
+        tw1: tw1Amount.toString(),
+        tw2: tw2Amount.toString(),
+        tw3: tw3Amount.toString(),
+        tw4: tw4Amount.toString(),
+        total: (data.total || budget || (tw1Amount + tw2Amount + tw3Amount + tw4Amount)).toString(),
+        realisasi: (data.realisasi || '0').toString(),
+        tanggal: data.tanggal || new Date().toISOString().split('T')[0],
+        noPesanan: data.noPesanan || null,
         status: data.status || 'draft',
         standardId: data.standardId || 'd36a22a2-5747-4bab-9c4c-eca7edba751b',
         createdBy: data.createdBy || 'd8e1be8f-f3cc-459f-929d-7f8a854c5f39'
