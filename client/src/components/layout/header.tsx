@@ -35,10 +35,10 @@ export default function Header() {
 
       {/* Right side */}
       <div className="flex items-center space-x-4">
-        {/* System Demo Notice */}
-        <div className="bg-blue-50 border border-blue-200 px-3 py-1 rounded-md">
-          <p className="text-xs text-blue-700 font-medium">
-            Sistem Demo - Data Simulasi
+        {/* System Status */}
+        <div className="bg-green-50 border border-green-200 px-3 py-1 rounded-md">
+          <p className="text-xs text-green-700 font-medium">
+            Sistem Aktif
           </p>
         </div>
 

@@ -233,6 +233,116 @@ export default function AdminUsers() {
                 <span>Tambah User</span>
               </Button>
             </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingUser ? 'Edit User' : 'Tambah User Baru'}
+                </DialogTitle>
+              </DialogHeader>
+
+              <Form {...form}>
+                <form 
+                  onSubmit={form.handleSubmit(editingUser ? handleUpdateUser : handleCreateUser)} 
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nama Lengkap</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Masukkan nama lengkap..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="Masukkan email..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Masukkan username..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="super_admin">Super Admin</SelectItem>
+                            <SelectItem value="operator">Operator</SelectItem>
+                            <SelectItem value="viewer">Viewer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="schoolName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nama Sekolah</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Masukkan nama sekolah..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => {
+                        setIsCreateOpen(false);
+                        setEditingUser(null);
+                        form.reset();
+                      }}
+                    >
+                      Batal
+                    </Button>
+                    <Button type="submit">
+                      {editingUser ? 'Update' : 'Simpan'}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
           </Dialog>
         </div>
 
@@ -468,117 +578,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        {/* Create/Edit User Dialog */}
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingUser ? 'Edit User' : 'Tambah User Baru'}
-            </DialogTitle>
-          </DialogHeader>
 
-          <Form {...form}>
-            <form 
-              onSubmit={form.handleSubmit(editingUser ? handleUpdateUser : handleCreateUser)} 
-              className="space-y-4"
-            >
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Masukkan nama lengkap..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="Masukkan email..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Masukkan username..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="super_admin">Super Admin</SelectItem>
-                        <SelectItem value="operator">Operator</SelectItem>
-                        <SelectItem value="viewer">Viewer</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="schoolName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Sekolah</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Masukkan nama sekolah..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => {
-                    setIsCreateOpen(false);
-                    setEditingUser(null);
-                    form.reset();
-                  }}
-                >
-                  Batal
-                </Button>
-                <Button type="submit">
-                  {editingUser ? 'Update' : 'Simpan'}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
           </div>
         </main>
       </div>
